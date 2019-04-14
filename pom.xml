@@ -65,40 +65,13 @@
                 <filtering>true</filtering>
                 <directory>${basedir}/src/main/resources/</directory>
                 <includes>
+                    <include>bungee.yml</include>
+                    <include>config.properties</include>
                     <include>plugin.yml</include>
-                    <include>config.yml</include>
                 </includes>
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <relocations>
-                        <relocation>
-                            <pattern>me.dablakbandit.core.plugin</pattern>
-                            <shadedPattern>me.dablakbandit.${project.artifactId}.core.plugin</shadedPattern>
-                        </relocation>
-                    </relocations>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <minimizeJar>true</minimizeJar>
-                    <artifactSet>
-                        <includes>
-                            <include>me.dablakbandit:core-plugin-downloader</include>
-                        </includes>
-                    </artifactSet>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.8</version>

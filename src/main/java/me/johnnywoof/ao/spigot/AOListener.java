@@ -80,7 +80,6 @@ public class AOListener implements Listener{
 	 */
 	public boolean validate(String username){
 		return username != null && pat.matcher(username).matches();
-		
 	}
 	
 }

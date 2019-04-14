@@ -8,11 +8,9 @@ public class PlayerData{
 	public final UUID	uuid;
 	
 	public PlayerData(String ipAddress, UUID uuid){
-		
 		// Preconditions.checkNotNull(uuid);
 		if(uuid == null)
 			throw new NullPointerException("UUID provided is null.");
-		
 		this.uuid = uuid;
 		this.ipAddress = ipAddress;
 	}
