@@ -27,10 +27,22 @@ public class NMSAuthService extends YggdrasilMinecraftSessionService{
 		this.database = database;
 	}
 	
-	private GameProfile runSuper(Object... args){
+	private GameProfile runSuper(GameProfile user, String serverId, InetAddress address){
 		try{
-			MethodHandle handle = MethodHandles.lookup().findSpecial(YggdrasilMinecraftSessionService.class, "hasJoinedServer", MethodType.methodType(GameProfile.class), NMSAuthService.class);
-			return (GameProfile)handle.invoke(args);
+			MethodHandle handle = MethodHandles.lookup().findSpecial(YggdrasilMinecraftSessionService.class, "hasJoinedServer", MethodType.methodType(GameProfile.class, GameProfile.class, String.class, InetAddress.class), NMSAuthService.class);
+			return (GameProfile)handle.invokeWithArguments(this, user, serverId, address);
+		}catch(Exception e){
+			e.printStackTrace();
+		}catch(Throwable throwable){
+			throwable.printStackTrace();
+		}
+		return null;
+	}
+	
+	private GameProfile runSuper(GameProfile user, String serverId){
+		try{
+			MethodHandle handle = MethodHandles.lookup().findSpecial(YggdrasilMinecraftSessionService.class, "hasJoinedServer", MethodType.methodType(GameProfile.class, GameProfile.class, String.class), NMSAuthService.class);
+			return (GameProfile)handle.invokeWithArguments(this, user, serverId);
 		}catch(Exception e){
 			e.printStackTrace();
 		}catch(Throwable throwable){
@@ -49,7 +61,7 @@ public class NMSAuthService extends YggdrasilMinecraftSessionService{
 				throw new AuthenticationUnavailableException("Mojang servers are offline and we can't authenticate the player with our own system.");
 			}
 		}else{
-			return runSuper(this, user, serverId, address);
+			return runSuper(user, serverId, address);
 		}
 	}
 	
@@ -63,7 +75,7 @@ public class NMSAuthService extends YggdrasilMinecraftSessionService{
 				throw new AuthenticationUnavailableException("Mojang servers are offline and we can't authenticate the player with our own system.");
 			}
 		}else{
-			return runSuper(this, user, serverId);
+			return runSuper(user, serverId);
 		}
 	}
 	
