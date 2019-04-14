@@ -1,0 +1,11 @@
+name: AlwaysOnline
+version: ${version}
+main: me.johnnywoof.ao.spigot.SpigotLoader
+author: cocoraid
+website: http://www.spigotmc.org/resources/alwaysonline.820/
+commands:
+  alwaysonline:
+    description: Base command for always online.
+    permission: alwaysonline.usage
+    usage: /alwaysonline
+    aliases: [ao]

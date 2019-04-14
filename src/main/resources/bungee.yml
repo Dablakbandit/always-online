@@ -1,0 +1,5 @@
+name: AlwaysOnline
+version: ${version}
+main: me.johnnywoof.ao.bungee.BungeeLoader
+author: Johnnywoof
+website: http://www.spigotmc.org/resources/alwaysonline.820/
