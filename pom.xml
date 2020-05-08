@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.dablakbandit</groupId>
     <artifactId>always-online</artifactId>
-    <version>6.1.0</version>
+    <version>6.1.1</version>
     <packaging>jar</packaging>
     <name>always-online</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkit.version>1.13-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>1.14-R0.1-SNAPSHOT</bukkit.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>

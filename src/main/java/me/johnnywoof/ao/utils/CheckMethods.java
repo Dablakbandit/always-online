@@ -51,21 +51,6 @@ public class CheckMethods{
 		return true;
 	}
 	
-	public static boolean xpaw(){
-		String serverResponse;
-		try{
-			serverResponse = sendGet("http://xpaw.ru/mcstatus/status.json");
-			if(serverResponse.isEmpty())
-				return false;
-			else if(serverResponse.contains("<meta http-equiv=\"Refresh\" content=\"1; URL=http://xpaw.ru/mcstatus/\">"))
-				return xpaw();
-		}catch(IOException | URISyntaxException e){
-			e.printStackTrace();
-			return false;
-		}
-		return new JsonParser().parse(serverResponse).getAsJsonObject().getAsJsonObject("report").getAsJsonObject("session").get("title").equals("Online");
-	}
-	
 	private static String sendGet(String url) throws IOException, URISyntaxException{
 		URL obj = new URL(url);
 		URI uri = obj.toURI();
