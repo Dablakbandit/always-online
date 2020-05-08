@@ -2,7 +2,7 @@ name: AlwaysOnline
 version: ${version}
 main: me.johnnywoof.ao.spigot.SpigotLoader
 author: cocoraid
-website: http://www.spigotmc.org/resources/alwaysonline.820/
+website: https://www.spigotmc.org/resources/alwaysonline.66591/
 commands:
   alwaysonline:
     description: Base command for always online.
