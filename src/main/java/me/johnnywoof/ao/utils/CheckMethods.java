@@ -54,7 +54,7 @@ public class CheckMethods{
 	public static boolean xpaw(){
 		String serverResponse;
 		try{
-			serverResponse = sendGet("http://xpaw.ru/mcstatus/status.json");
+			serverResponse = sendGet("https://xpaw.ru/mcstatus/status.json");
 			if(serverResponse.isEmpty())
 				return false;
 			else if(serverResponse.contains("<meta http-equiv=\"Refresh\" content=\"1; URL=http://xpaw.ru/mcstatus/\">"))
