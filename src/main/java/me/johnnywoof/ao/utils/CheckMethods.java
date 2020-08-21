@@ -22,7 +22,7 @@ public class CheckMethods{
 	public static boolean directSessionServerStatus(Gson gson){
 		String serverResponse;
 		try{
-			serverResponse = sendGet("https://sessionserver.mojang.com/");
+			serverResponse = sendGet("https://authserver.mojang.com/");
 			if(serverResponse.isEmpty())
 				return false;
 		}catch(IOException | URISyntaxException e){
