@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import me.johnnywoof.ao.spigot.authservices.NMSAuthSetup;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -34,7 +35,7 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 		
 		try{
 			this.getLogger().info("Setting up NMS authentication service...");
-			NMSAuthService.setUp(this);
+			NMSAuthSetup.setUp(this);
 		}catch(Exception e){
 			e.printStackTrace();
 			this.getLogger().severe("Failed to override the authentication handler. Due to possible security risks, the server will now shut down.");

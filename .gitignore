@@ -1,2 +1,6 @@
 *.iml
 target/*
+.idea/*
+*.xml
+common/target/*
+auth-environment/target/*
