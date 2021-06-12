@@ -6,12 +6,47 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NMSUtils{
+public class NMSUtils {
+	
+	private static Method	varHandleSet		= null;
+	private static Object	modifiersVarHandle	= null;
+	private static Field	modifiersField		= null;
+	
+	{
+		try{
+			Class.forName("java.lang.invoke.VarHandle");
+			Class<?> methodHandles = getClass("java.lang.invoke.MethodHandles");
+			Class<?> lookup = getInnerClass(methodHandles, "Lookup");
+			Method privateLookupIn = getMethod(methodHandles, "privateLookupIn", Class.class, lookup);
+			Method lookupMethod = getMethod(methodHandles, "lookup");
+			Object lookupObject = privateLookupIn.invoke(null, Field.class, lookupMethod.invoke(null));
+			Method findVarHandle = getMethod(lookup, "findVarHandle", Class.class, String.class, Class.class);
+			modifiersVarHandle = findVarHandle.invoke(lookupObject, Field.class, "modifiers", int.class);
+		}catch(Exception e){
+		}
+	}
+	{
+		try{
+			Class<?> classVarHandle = Class.forName("java.lang.invoke.VarHandle");
+			varHandleSet = getMethod(classVarHandle, "set", Object[].class);
+		}catch(Exception e){
+		}
+	}
+	
+	{
+		try{
+			modifiersField = Field.class.getDeclaredField("modifiers");
+			modifiersField.setAccessible(true);
+		}catch(Exception ignored){
+		}
+	}
 	
 	private static Map<Class<?>, Method>	handleMethods	= new HashMap<>();
 	private static String					version			= getVersion();
@@ -164,39 +199,119 @@ public class NMSUtils{
 			return null;
 		}
 	}
-
-	private static Field setAccesible(Field field) throws Exception{
-		field.setAccessible(true);
-		int modifiers = field.getModifiers();
-		try {
-			Field modifiersField = Field.class.getDeclaredField("modifiers");
-			modifiersField.setAccessible(true);
-			modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
-		} catch (NoSuchFieldException e) {
-			if ("modifiers".equals(e.getMessage()) || (e.getCause() != null && e.getCause().getMessage() != null &&  e.getCause().getMessage().equals("modifiers"))) {
-				// https://github.com/ViaVersion/ViaVersion/blob/e07c994ddc50e00b53b728d08ab044e66c35c30f/bungee/src/main/java/us/myles/ViaVersion/bungee/platform/BungeeViaInjector.java
-				// Java 12 compatibility *this is fine*
-				Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-				getDeclaredFields0.setAccessible(true);
-				Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
-				for (Field classField : fields) {
-					if ("modifiers".equals(classField.getName())) {
-						classField.setAccessible(true);
-						classField.set(field, modifiers & ~Modifier.FINAL);
-						break;
+	
+	public static Field setAccessible(Field field) throws Exception{
+		return setAccessible(field, false);
+	}
+	
+	public static Field setAccessible(Field field, boolean readOnly) throws Exception{
+		return setAccessible(field, readOnly, false);
+	}
+	
+	private static Field setAccessible(Field field, boolean readOnly, boolean privileged) throws Exception{
+		try{
+			field.setAccessible(true);
+		}catch(Exception e){
+			if(!privileged){
+				return AccessController.doPrivileged((PrivilegedAction<Field>)() -> {
+					try{
+						return setAccessible(field, readOnly, true);
+					}catch(Exception e1){
+						e1.printStackTrace();
 					}
-				}
-			} else {
-				throw e;
+					return field;
+				});
 			}
 		}
+		if(readOnly){ return field; }
+		removeFinal(field, privileged);
 		return field;
+	}
+	
+	private static void removeFinal(Field field, boolean privileged) throws ReflectiveOperationException{
+		int modifiers = field.getModifiers();
+		if(Modifier.isFinal(modifiers)){
+			try{
+				removeFinalSimple(field);
+			}catch(Exception e1){
+				try{
+					removeFinalVarHandle(field);
+				}catch(Exception e2){
+					try{
+						removeFinalNativeDeclaredFields(field);
+					}catch(Exception e3){
+						if(!privileged){
+							AccessController.doPrivileged((PrivilegedAction<Field>)() -> {
+								try{
+									setAccessible(field, false, true);
+								}catch(Exception e){
+								}
+								return null;
+							});
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private static void removeFinalSimple(Field field) throws ReflectiveOperationException{
+		int modifiers = field.getModifiers();
+		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		modifiersField.setAccessible(true);
+		modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
+	}
+	
+	private static void removeFinalVarHandle(Field field) throws ReflectiveOperationException{
+		int modifiers = field.getModifiers();
+		int newModifiers = modifiers & ~Modifier.FINAL;
+		if(modifiersVarHandle != null){
+			varHandleSet.invoke(modifiersVarHandle, field, newModifiers);
+		}else{
+			modifiersField.setInt(field, newModifiers);
+		}
+	}
+	
+	private static void removeFinalNativeDeclaredFields(Field field) throws ReflectiveOperationException{
+		removeFinalNativeDeclaredFields(field, false);
+	}
+	
+	private static void removeFinalNativeDeclaredFields(Field field, boolean secondTry) throws ReflectiveOperationException{
+		int modifiers = field.getModifiers();
+		// https://github.com/ViaVersion/ViaVersion/blob/e07c994ddc50e00b53b728d08ab044e66c35c30f/bungee/src/main/java/us/myles/ViaVersion/bungee/platform/BungeeViaInjector.java
+		// Java 12 compatibility *this is fine*
+		Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+		getDeclaredFields0.setAccessible(true);
+		Field[] fields = (Field[])getDeclaredFields0.invoke(Field.class, false);
+		for(Field classField : fields){
+			if("modifiers".equals(classField.getName())){
+				classField.setAccessible(true);
+				classField.set(field, modifiers & ~Modifier.FINAL);
+				break;
+			}
+		}
+	}
+	
+	public static List<Field> getDirectFields(Class<?> clazz){
+		List<Field> f = new ArrayList<Field>();
+		for(Field field : clazz.getDeclaredFields()){
+			try{
+				field = setAccessible(field);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			if(!Modifier.isStatic(field.getModifiers())){
+				f.add(field);
+			}
+		}
+		return f;
 	}
 	
 	public static List<Field> getFields(Class<?> clazz) throws Exception{
 		List<Field> f = new ArrayList<Field>();
 		for(Field field : clazz.getDeclaredFields()){
-			field = setAccesible(field);
+			field = setAccessible(field);
 			f.add(field);
 		}
 		return f;
@@ -206,7 +321,7 @@ public class NMSUtils{
 		List<Field> f = new ArrayList<Field>();
 		do{
 			for(Field field : clazz.getDeclaredFields()){
-				field = setAccesible(field);
+				field = setAccessible(field);
 				f.add(field);
 			}
 		}while((clazz = clazz.getSuperclass()) != null);
@@ -216,7 +331,7 @@ public class NMSUtils{
 	public static Field getFieldWithException(Class<?> clazz, String name) throws Exception{
 		for(Field field : clazz.getDeclaredFields())
 			if(field.getName().equals(name)){
-				field = setAccesible(field);
+				field = setAccessible(field);
 				return field;
 			}
 		throw new Exception("Field Not Found");
@@ -273,7 +388,7 @@ public class NMSUtils{
 	public static Field getFieldOfTypeWithException(Class<?> clazz, Class<?> type, String name) throws Exception{
 		for(Field field : clazz.getDeclaredFields())
 			if(field.getName().equals(name) && field.getType().equals(type)){
-				field = setAccesible(field);
+				field = setAccessible(field);
 				return field;
 			}
 		throw new Exception("Field Not Found");
@@ -291,7 +406,7 @@ public class NMSUtils{
 	public static Field getFirstFieldOfTypeWithException(Class<?> clazz, Class<?> type) throws Exception{
 		for(Field field : clazz.getDeclaredFields()){
 			if(field.getType().equals(type)){
-				field = setAccesible(field);
+				field = setAccessible(field);
 				return field;
 			}
 		}
@@ -322,7 +437,7 @@ public class NMSUtils{
 		for(int i = 0; i < j; i++){
 			Field field = arrayOfField[i];
 			if(type.isAssignableFrom(field.getType())){
-				field = setAccesible(field);
+				field = setAccessible(field);
 				list.add(field);
 			}
 		}
@@ -346,7 +461,7 @@ public class NMSUtils{
 				field = f;
 			}
 		if(field == null){ throw new Exception("Field Not Found"); }
-		field = setAccesible(field);
+		field = setAccessible(field);
 		return field;
 	}
 	
@@ -537,7 +652,6 @@ public class NMSUtils{
 		try{
 			return con.newInstance(objects);
 		}catch(Exception e){
-			e.printStackTrace();
 		}
 		return null;
 	}
