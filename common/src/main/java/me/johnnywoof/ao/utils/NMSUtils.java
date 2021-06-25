@@ -89,8 +89,20 @@ public class NMSUtils {
 		return null;
 	}
 	
-	public static Class<?> getNMSClassWithException(String className) throws Exception{
+	public static Class<?> getNMSVersionClassWithException(String className) throws Exception{
 		return Class.forName("net.minecraft.server." + getVersion() + className);
+	}
+
+	public static Class<?> getNMSNormalClassWithException(String className) throws Exception{
+		return Class.forName("net.minecraft.server." + className);
+	}
+
+	public static Class<?> getNMSClassWithException(String className) throws Exception{
+		try{
+			return getNMSVersionClassWithException(className);
+		}catch(Exception e){
+		}
+		return getNMSNormalClassWithException(className);
 	}
 	
 	public static Class<?> getNMSClass(String className){
@@ -104,7 +116,7 @@ public class NMSUtils {
 	
 	public static Class<?> getNMSClassSilent(String className){
 		try{
-			return getNMSClassWithException(className);
+			return getNMSVersionClassWithException(className);
 		}catch(Exception e){
 		}
 		return null;
@@ -112,7 +124,7 @@ public class NMSUtils {
 	
 	public static Class<?> getNMSClass(String className, String embedded){
 		try{
-			return getNMSClassWithException(className);
+			return getNMSVersionClassWithException(className);
 		}catch(Exception e){
 			return getInnerClassSilent(getNMSClassSilent(embedded), className);
 		}
