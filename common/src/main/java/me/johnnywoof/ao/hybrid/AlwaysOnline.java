@@ -118,7 +118,7 @@ public class AlwaysOnline{
 			this.nativeExecutor.log(Level.INFO, "Loading MySQL database...");
 			try{
 				this.database = new MySQLDatabase(	this.nativeExecutor, this.config.getProperty("host", "127.0.0.1"), Integer.parseInt(this.config.getProperty("port", "3306")), this.config.getProperty("database-name", "minecraft"), this.config.getProperty("database-username", "root"),
-													this.config.getProperty("database-password", "password"));
+													this.config.getProperty("database-password", "password"), this.config.getProperty("database-extra", ""));
 			}catch(SQLException e){
 				this.nativeExecutor.log(Level.WARNING, "Failed to load the MySQL database, falling back to file database.");
 				e.printStackTrace();

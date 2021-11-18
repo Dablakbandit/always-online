@@ -18,6 +18,7 @@ public class MySQLDatabase implements Database{
 	private final String								database;
 	private final String								username;
 	private final String								password;
+	private final String 								extra;
 	
 	private final ConcurrentHashMap<String, PlayerData>	cache				= new ConcurrentHashMap<>();
 	
@@ -26,12 +27,13 @@ public class MySQLDatabase implements Database{
 	private final NativeExecutor						nativeExecutor;
 	private int											pingTaskID			= -1;
 	
-	public MySQLDatabase(NativeExecutor nativeExecutor, String host, int port, String database, String username, String password) throws SQLException{
+	public MySQLDatabase(NativeExecutor nativeExecutor, String host, int port, String database, String username, String password, String extra) throws SQLException{
 		this.host = host;
 		this.port = port;
 		this.database = database;
 		this.username = username;
 		this.password = password;
+		this.extra = extra;
 		this.nativeExecutor = nativeExecutor;
 		this.connect();
 	}
@@ -52,7 +54,7 @@ public class MySQLDatabase implements Database{
 	
 	private void connect() throws SQLException{
 		this.close();// Close existing database connections, if one exists.
-		this.statement = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.username, this.password).createStatement();
+		this.statement = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + extra, this.username, this.password).createStatement();
 		if(!this.doesTableExist("always_online")){
 			this.statement.executeUpdate("CREATE TABLE `always_online` ( `name` CHAR(16) NOT NULL , `ip` CHAR(15) NOT NULL , `uuid` CHAR(36) NOT NULL , PRIMARY KEY (`name`)) ENGINE = MyISAM; ");
 		}
