@@ -54,7 +54,7 @@ public class MySQLDatabase implements Database{
 	
 	private void connect() throws SQLException{
 		this.close();// Close existing database connections, if one exists.
-		this.statement = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + extra, this.username, this.password).createStatement();
+		this.statement = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + this.extra, this.username, this.password).createStatement();
 		if(!this.doesTableExist("always_online")){
 			this.statement.executeUpdate("CREATE TABLE `always_online` ( `name` CHAR(16) NOT NULL , `ip` CHAR(15) NOT NULL , `uuid` CHAR(36) NOT NULL , PRIMARY KEY (`name`)) ENGINE = MyISAM; ");
 		}
