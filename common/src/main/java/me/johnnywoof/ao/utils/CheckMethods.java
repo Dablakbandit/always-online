@@ -34,23 +34,6 @@ public class CheckMethods{
 		return !data.containsKey("Status") || "OK".equals(data.get("Status"));
 	}
 	
-	public static boolean mojangHelpPage(){
-		String serverResponse;
-		try{
-			serverResponse = sendGet("https://status.mojang.com/check");
-			if(serverResponse.isEmpty())
-				return false;
-		}catch(IOException | URISyntaxException e){
-			return false;
-		}
-		JsonArray jsonResponse = new JsonParser().parse(serverResponse).getAsJsonArray();
-		for(int i = 0; i < jsonResponse.size(); i++){
-			JsonObject status = jsonResponse.get(i).getAsJsonObject();
-			if(status.get("sessionserver.mojang.com") != null){ return !"red".equals(status.get("sessionserver.mojang.com").getAsString()); }
-		}
-		return true;
-	}
-	
 	private static String sendGet(String url) throws IOException, URISyntaxException{
 		URL obj = new URL(url);
 		URI uri = obj.toURI();

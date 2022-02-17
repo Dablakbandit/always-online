@@ -14,7 +14,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.johnnywoof.ao.NativeExecutor;
 import me.johnnywoof.ao.hybrid.AlwaysOnline;
-import me.johnnywoof.ao.spigot.authservices.NMSAuthService;
 
 public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 	

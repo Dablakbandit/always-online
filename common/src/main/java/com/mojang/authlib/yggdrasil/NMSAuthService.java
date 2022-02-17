@@ -1,12 +1,4 @@
-package me.johnnywoof.ao.spigot.authservices;
-
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
-import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
-import me.johnnywoof.ao.databases.Database;
-import me.johnnywoof.ao.hybrid.AlwaysOnline;
-import me.johnnywoof.ao.spigot.SpigotLoader;
+package com.mojang.authlib.yggdrasil;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -15,18 +7,27 @@ import java.net.InetAddress;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class NMSAuthEnvironmentService extends AuthEnvironmentService {
-	
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
+
+import me.johnnywoof.ao.databases.Database;
+import me.johnnywoof.ao.hybrid.AlwaysOnline;
+import me.johnnywoof.ao.spigot.SpigotLoader;
+
+public class NMSAuthService extends YggdrasilMinecraftSessionService{
+
+	private final YggdrasilMinecraftSessionService oldSessionService;
 	private final Database database;
 	
-	public NMSAuthEnvironmentService(YggdrasilAuthenticationService authenticationService, Object enviroment, Database database){
-		super(authenticationService, enviroment);
+	public NMSAuthService(YggdrasilMinecraftSessionService oldSessionService, YggdrasilAuthenticationService authenticationService, Database database){
+		super(authenticationService);
+		this.oldSessionService = oldSessionService;
 		this.database = database;
 	}
 	
 	private GameProfile runSuper(GameProfile user, String serverId, InetAddress address){
 		try{
-			MethodHandle handle = MethodHandles.lookup().findSpecial(YggdrasilMinecraftSessionService.class, "hasJoinedServer", MethodType.methodType(GameProfile.class, GameProfile.class, String.class, InetAddress.class), NMSAuthEnvironmentService.class);
+			MethodHandle handle = MethodHandles.lookup().findSpecial(YggdrasilMinecraftSessionService.class, "hasJoinedServer", MethodType.methodType(GameProfile.class, GameProfile.class, String.class, InetAddress.class), NMSAuthService.class);
 			return (GameProfile)handle.invokeWithArguments(this, user, serverId, address);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -38,7 +39,7 @@ public class NMSAuthEnvironmentService extends AuthEnvironmentService {
 	
 	private GameProfile runSuper(GameProfile user, String serverId){
 		try{
-			MethodHandle handle = MethodHandles.lookup().findSpecial(YggdrasilMinecraftSessionService.class, "hasJoinedServer", MethodType.methodType(GameProfile.class, GameProfile.class, String.class), NMSAuthEnvironmentService.class);
+			MethodHandle handle = MethodHandles.lookup().findSpecial(YggdrasilMinecraftSessionService.class, "hasJoinedServer", MethodType.methodType(GameProfile.class, GameProfile.class, String.class), NMSAuthService.class);
 			return (GameProfile)handle.invokeWithArguments(this, user, serverId);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -75,5 +76,12 @@ public class NMSAuthEnvironmentService extends AuthEnvironmentService {
 			return runSuper(user, serverId);
 		}
 	}
-	
+
+	protected GameProfile fillGameProfile(GameProfile profile, boolean requireSecure) {
+		return oldSessionService.fillGameProfile(profile, requireSecure);
+	}
+
+	public GameProfile fillProfileProperties(GameProfile profile, boolean requireSecure) {
+		return oldSessionService.fillProfileProperties(profile, requireSecure);
+	}
 }

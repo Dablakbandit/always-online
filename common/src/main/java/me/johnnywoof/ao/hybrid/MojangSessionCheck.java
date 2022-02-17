@@ -9,7 +9,7 @@ import me.johnnywoof.ao.utils.CheckMethods;
 public class MojangSessionCheck implements Runnable{
 	
 	private final AlwaysOnline	alwaysOnline;
-	private final boolean		useHeadSessionServer, mojangServerStatus;
+	private final boolean		useHeadSessionServer;
 	private final int			totalCheckMethods;
 	private final String		messageMojangOffline, messageMojangOnline;
 	private final Gson			gson;
@@ -17,10 +17,6 @@ public class MojangSessionCheck implements Runnable{
 	public MojangSessionCheck(AlwaysOnline alwaysOnline){
 		this.alwaysOnline = alwaysOnline;
 		int methodCount = 0;
-		this.mojangServerStatus = Boolean.parseBoolean(this.alwaysOnline.config.getProperty("mojang-server-status", "false"));
-		this.alwaysOnline.nativeExecutor.log(Level.INFO, "Mojang help page check: " + this.mojangServerStatus);
-		if(this.mojangServerStatus)
-			methodCount++;
 		boolean headCheck = Boolean.parseBoolean(this.alwaysOnline.config.getProperty("http-head-session-server", "false"));
 		if(methodCount == 0 && !headCheck){
 			this.alwaysOnline.nativeExecutor.log(Level.WARNING, "No check methods have been enabled in the configuration. " + "Going to enable the head session server check.");
@@ -47,8 +43,6 @@ public class MojangSessionCheck implements Runnable{
 			return;
 		int downServiceReport = 0;
 		if(this.useHeadSessionServer && !CheckMethods.directSessionServerStatus(this.gson))
-			downServiceReport++;
-		if(this.mojangServerStatus && !CheckMethods.mojangHelpPage())
 			downServiceReport++;
 		if(downServiceReport >= this.totalCheckMethods){// Offline
 			if(!AlwaysOnline.MOJANG_OFFLINE_MODE){

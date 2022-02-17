@@ -3,6 +3,8 @@ package me.johnnywoof.ao.spigot.authservices;
 import com.mojang.authlib.AuthenticationService;
 import com.mojang.authlib.minecraft.BaseMinecraftSessionService;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.yggdrasil.NMSAuthEnvironmentService;
+import com.mojang.authlib.yggdrasil.NMSAuthService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import me.johnnywoof.ao.spigot.SpigotLoader;
@@ -29,12 +31,12 @@ public class NMSAuthSetup {
     public static void setUp(SpigotLoader spigotLoader) throws Exception {
         Object ms = getServer.invoke(null);
         YggdrasilMinecraftSessionService service = null;
+        YggdrasilMinecraftSessionService oldSessionService = (YggdrasilMinecraftSessionService) sessionService.get(ms);
         if(authentificationService == null){
-            MinecraftSessionService session = (MinecraftSessionService) sessionService.get(ms);
-            YggdrasilAuthenticationService current = (YggdrasilAuthenticationService)baseAuthentificationService.get(session);
-            service = new NMSAuthEnvironmentService(current, environment.get(current), spigotLoader.alwaysOnline.database);
+            YggdrasilAuthenticationService current = (YggdrasilAuthenticationService)baseAuthentificationService.get(oldSessionService);
+            service = new NMSAuthEnvironmentService(oldSessionService, current, environment.get(current), spigotLoader.alwaysOnline.database);
         }else{
-            service = new NMSAuthService((YggdrasilAuthenticationService) authentificationService.get(ms), spigotLoader.alwaysOnline.database);
+            service = new NMSAuthService(oldSessionService, (YggdrasilAuthenticationService) authentificationService.get(ms), spigotLoader.alwaysOnline.database);
         }
         sessionService.set(ms, service);
     }
