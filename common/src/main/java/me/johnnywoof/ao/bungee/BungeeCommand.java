@@ -8,11 +8,11 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Command;
 
-public class AOCommand extends Command{
+public class BungeeCommand extends Command{
 	
 	private final BungeeLoader ao;
 	
-	public AOCommand(BungeeLoader ao){
+	public BungeeCommand(BungeeLoader ao){
 		super("alwaysonline", "alwaysonline.usage", "ao");
 		this.ao = ao;
 	}

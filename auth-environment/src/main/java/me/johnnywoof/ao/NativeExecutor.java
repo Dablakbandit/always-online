@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import me.johnnywoof.ao.hybrid.AlwaysOnline;
+import me.johnnywoof.ao.hybrid.IAlwaysOnline;
 
 public interface NativeExecutor{
 	
@@ -26,6 +26,6 @@ public interface NativeExecutor{
 	
 	void broadcastMessage(String message);
 	
-	AlwaysOnline getAOInstance();
+	IAlwaysOnline getAOInstance();
 	
 }

@@ -18,7 +18,7 @@ public class BungeeLoader extends Plugin implements NativeExecutor{
 	public void onEnable(){
 		this.alwaysOnline.reload();
 		// Execute native setup
-		this.getProxy().getPluginManager().registerCommand(this, new AOCommand(this));
+		this.getProxy().getPluginManager().registerCommand(this, new BungeeCommand(this));
 	}
 	
 	@Override
@@ -63,7 +63,7 @@ public class BungeeLoader extends Plugin implements NativeExecutor{
 	
 	@Override
 	public void registerListener(){
-		this.getProxy().getPluginManager().registerListener(this, new AOListener(this));
+		this.getProxy().getPluginManager().registerListener(this, new BungeeListener(this));
 	}
 	
 	@Override

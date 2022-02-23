@@ -19,10 +19,6 @@
 
     <repositories>
         <repository>
-            <id>file</id>
-            <url>file://E:/Users/ashle/.m2/repository</url>
-        </repository>
-        <repository>
             <id>everything</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
@@ -33,6 +29,10 @@
         <repository>
             <id>yawk</id>
             <url>https://ci.lucko.me/plugin/repository/everything/</url>
+        </repository>
+        <repository>
+            <id>velocity</id>
+            <url>https://nexus.velocitypowered.com/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -64,6 +64,12 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <artifactId>common</artifactId>
@@ -80,6 +86,7 @@
                     <include>bungee.yml</include>
                     <include>config.properties</include>
                     <include>plugin.yml</include>
+                    <include>**/*.java</include>
                 </includes>
             </resource>
         </resources>

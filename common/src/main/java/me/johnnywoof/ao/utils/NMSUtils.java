@@ -52,10 +52,14 @@ public class NMSUtils {
 	private static String					version			= getVersion();
 	
 	public static String getVersion(){
-		if(version != null)
-			return version;
-		String name = Bukkit.getServer().getClass().getPackage().getName();
-		return name.substring(name.lastIndexOf('.') + 1) + ".";
+		try {
+			if (version != null)
+				return version;
+			String name = Bukkit.getServer().getClass().getPackage().getName();
+			return name.substring(name.lastIndexOf('.') + 1) + ".";
+		}catch (Exception | Error e){
+			return null;
+		}
 	}
 	
 	public static Class<?> getClassWithException(String name) throws Exception{
@@ -183,30 +187,6 @@ public class NMSUtils {
 	public static Object getHandleSilent(Object obj){
 		try{
 			return getHandleWithException(obj);
-		}catch(Exception e){
-			return null;
-		}
-	}
-	
-	private static Class<?>	c	= getOBCClass("block.CraftBlock");
-	private static Method	m	= getMethod(c, "getNMSBlock");
-	
-	public static Object getBlockHandleWithException(Object obj) throws Exception{
-		return m.invoke(obj);
-	}
-	
-	public static Object getBlockHandle(Object obj){
-		try{
-			return m.invoke(obj);
-		}catch(Exception e){
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	public static Object getBlockHandleSilent(Object obj){
-		try{
-			return m.invoke(obj);
 		}catch(Exception e){
 			return null;
 		}

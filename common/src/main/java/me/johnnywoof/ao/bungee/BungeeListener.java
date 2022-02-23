@@ -3,9 +3,9 @@ package me.johnnywoof.ao.bungee;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import me.johnnywoof.ao.hybrid.AlwaysOnline;
+import me.johnnywoof.ao.proxy.ProxyListener;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
@@ -17,17 +17,14 @@ import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
-public class AOListener implements Listener{
-	
-	private final Pattern		pat	= Pattern.compile("^[a-zA-Z0-9_-]{3,16}$");	// The regex to verify usernames;
-	
-	private String				MOTD;
-	
+public class BungeeListener extends ProxyListener implements Listener{
+
 	private final BungeeLoader	bungeeLoader;
 	
-	public AOListener(BungeeLoader bungeeLoader){
+	public BungeeListener(BungeeLoader bungeeLoader){
+		super(bungeeLoader);
 		this.bungeeLoader = bungeeLoader;
-		this.MOTD = ChatColor.translateAlternateColorCodes('&', this.bungeeLoader.alwaysOnline.config.getProperty("message-motd-offline", "&eMojang servers are down,\\n&ebut you can still connect!"));
+		this.MOTD = ChatColor.translateAlternateColorCodes('&', this.bungeeLoader.getAOInstance().config.getProperty("message-motd-offline", "&eMojang servers are down,\\n&ebut you can still connect!"));
 		if("null".equals(this.MOTD))
 			this.MOTD = null;
 	}
@@ -120,20 +117,11 @@ public class AOListener implements Listener{
 			this.bungeeLoader.getProxy().getScheduler().runAsync(this.bungeeLoader, new Runnable(){
 				@Override
 				public void run(){
-					AOListener.this.bungeeLoader.alwaysOnline.database.updatePlayer(username, ip, uuid);
+					BungeeListener.this.bungeeLoader.alwaysOnline.database.updatePlayer(username, ip, uuid);
 				}
 			});
 		}
 	}
-	
-	/**
-	 * Validate username with regular expression
-	 *
-	 * @param username username for validation
-	 * @return true valid username, false invalid username
-	 */
-	public boolean validate(String username){
-		return username != null && pat.matcher(username).matches();
-	}
+
 	
 }

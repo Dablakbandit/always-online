@@ -21,7 +21,7 @@ import me.johnnywoof.ao.databases.FileDatabase;
 import me.johnnywoof.ao.databases.MySQLDatabase;
 import me.johnnywoof.ao.utils.CheckMethods;
 
-public class AlwaysOnline{
+public class AlwaysOnline implements IAlwaysOnline{
 	
 	public static boolean		MOJANG_OFFLINE_MODE	= false, CHECK_SESSION_STATUS = true;
 	
