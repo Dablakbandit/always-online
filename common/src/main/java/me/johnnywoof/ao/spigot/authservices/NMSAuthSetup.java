@@ -30,8 +30,8 @@ public class NMSAuthSetup {
 
     public static void setUp(SpigotLoader spigotLoader) throws Exception {
         Object ms = getServer.invoke(null);
-        YggdrasilMinecraftSessionService service = null;
-        YggdrasilMinecraftSessionService oldSessionService = (YggdrasilMinecraftSessionService) sessionService.get(ms);
+        Object service = null;
+        Object oldSessionService = sessionService.get(ms);
         if(authentificationService == null){
             YggdrasilAuthenticationService current = (YggdrasilAuthenticationService)baseAuthentificationService.get(oldSessionService);
             service = new NMSAuthEnvironmentService(oldSessionService, current, environment.get(current), spigotLoader.alwaysOnline.database);

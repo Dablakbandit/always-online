@@ -3,6 +3,8 @@ package com.mojang.authlib.yggdrasil;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -13,16 +15,21 @@ import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import me.johnnywoof.ao.databases.Database;
 import me.johnnywoof.ao.hybrid.AlwaysOnline;
 import me.johnnywoof.ao.spigot.SpigotLoader;
+import me.johnnywoof.ao.utils.NMSUtils;
 
 public class NMSAuthService extends YggdrasilMinecraftSessionService{
 
 	private final YggdrasilMinecraftSessionService oldSessionService;
 	private final Database database;
-	
-	public NMSAuthService(YggdrasilMinecraftSessionService oldSessionService, YggdrasilAuthenticationService authenticationService, Database database){
+	private final Method fillGameProfile;
+	private final Method fillProfileProperties;
+
+	public NMSAuthService(Object oldSessionService, YggdrasilAuthenticationService authenticationService, Database database){
 		super(authenticationService);
-		this.oldSessionService = oldSessionService;
+		this.oldSessionService = (YggdrasilMinecraftSessionService) oldSessionService;
 		this.database = database;
+		this.fillGameProfile = NMSUtils.getMethod(oldSessionService.getClass(), "fillGameProfile", GameProfile.class, boolean.class);
+		this.fillProfileProperties = NMSUtils.getMethod(oldSessionService.getClass(), "fillProfileProperties", GameProfile.class, boolean.class);
 	}
 	
 	private GameProfile runSuper(GameProfile user, String serverId, InetAddress address){
@@ -78,10 +85,22 @@ public class NMSAuthService extends YggdrasilMinecraftSessionService{
 	}
 
 	protected GameProfile fillGameProfile(GameProfile profile, boolean requireSecure) {
-		return oldSessionService.fillGameProfile(profile, requireSecure);
+		try {
+			return (GameProfile) fillGameProfile.invoke(oldSessionService, profile, requireSecure);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public GameProfile fillProfileProperties(GameProfile profile, boolean requireSecure) {
-		return oldSessionService.fillProfileProperties(profile, requireSecure);
+		try {
+			return (GameProfile) fillProfileProperties.invoke(oldSessionService, profile, requireSecure);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
