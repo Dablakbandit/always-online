@@ -17,6 +17,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class VelocityListener extends ProxyListener {
 
@@ -83,6 +84,19 @@ public class VelocityListener extends ProxyListener {
                 this.velocityLoader.getLogger().warn("Internal error for " + event.getGameProfile().getName() + "");
                 e.printStackTrace();
             }
+        } else {
+            // If we are not in mojang offline mode, update the player data
+            this.velocityLoader.server.getScheduler().buildTask(this.velocityLoader, new Runnable() {
+                @Override
+                public void run() {
+                    if(event.getConnection().isActive()) {
+                        String username = event.getUsername();
+                        String ip = event.getConnection().getRemoteAddress().getAddress().getHostAddress();
+                        UUID uuid = event.getGameProfile().getId();
+                        VelocityListener.this.velocityLoader.getAOInstance().database.updatePlayer(username, ip, uuid);
+                    }
+                }
+            }).delay(1, TimeUnit.SECONDS).schedule();
         }
     }
 
