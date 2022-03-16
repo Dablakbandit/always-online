@@ -20,7 +20,7 @@ public class CheckMethods{
 	private static final CookieHandler COOKIE_MANAGER = new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER);
 	
 	public static boolean directSessionServerStatus(Gson gson){
-		String serverResponse;
+		String serverResponse = "{}";
 		try{
 			serverResponse = sendGet("https://authserver.mojang.com/");
 			if(serverResponse.isEmpty())
