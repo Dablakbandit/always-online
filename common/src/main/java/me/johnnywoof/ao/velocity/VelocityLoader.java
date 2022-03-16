@@ -62,7 +62,7 @@ public class VelocityLoader implements NativeExecutor {
 
     @Override
     public void cancelTask(int taskID) {
-        ScheduledTask task = scheduledTasks.get(taskID);
+        ScheduledTask task = scheduledTasks.remove(taskID);
         if (task != null) {
             task.cancel();
         }

@@ -2,8 +2,9 @@ package me.johnnywoof.ao.velocity;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.ServerPing;
@@ -40,13 +41,15 @@ public class VelocityListener extends ProxyListener {
             final String ip = event.getConnection().getRemoteAddress().getAddress().getHostAddress();
             // Get last known ip
             final String lastip = this.velocityLoader.alwaysOnline.database.getIP(event.getUsername());
+
+
             if (lastip == null) {// If null the player connecting is new
                 event.setResult(PreLoginEvent.PreLoginComponentResult.denied(LegacyComponentSerializer.legacy('&').deserialize(this.velocityLoader.alwaysOnline.config.getProperty("message-kick-new", "We can not let you join because the mojang servers are offline!"))));
                 this.velocityLoader.getLogger().info("Denied " + event.getUsername() + " from logging in cause their ip [" + ip + "] has never connected to this server before!");
             } else {
                 if (ip.equals(lastip)) {// If it matches set handler to offline mode, so it does not authenticate player with mojang
                     this.velocityLoader.getLogger().info("Skipping session login for player " + event.getUsername() + " [Connected ip: " + ip + ", Last ip: " + lastip + "]!");
-                    event.setResult(PreLoginEvent.PreLoginComponentResult.allowed());
+                    event.setResult(PreLoginEvent.PreLoginComponentResult.forceOfflineMode());
                     //handler.setOnlineMode(false);
                 } else {// Deny the player from joining
                     this.velocityLoader.getLogger().info("Denied " + event.getUsername() + " from logging in cause their ip [" + ip + "] does not match their last ip!");
@@ -68,38 +71,19 @@ public class VelocityListener extends ProxyListener {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    // Set priority to lowest since we'll be needing to go first
-    @Subscribe(order = PostOrder.FIRST)
-    public void onPost(PostLoginEvent event) {
+    @Subscribe(order = PostOrder.LAST)
+    public void onGameProfileRequest(GameProfileRequestEvent event) {
         if (AlwaysOnline.MOJANG_OFFLINE_MODE) {
-            Player player = event.getPlayer();
             try {
-                UUID uuid = this.velocityLoader.getAOInstance().database.getUUID(event.getPlayer().getUsername());
-                // Reflection
+                GameProfile current = event.getGameProfile();
+                UUID uuid = this.velocityLoader.getAOInstance().database.getUUID(current.getName());
 
-                Field gp = NMSUtils.getFirstFieldOfType(player.getClass(), GameProfile.class);
-                GameProfile gameProfile = (GameProfile) gp.get(player);
-                Field sf = NMSUtils.getFirstFieldOfType(GameProfile.class, UUID.class);
-                sf.set(gameProfile, uuid);
-
-            } catch (Exception e) {// Play it safe, if an error deny the player
-                event.getPlayer().disconnect(LegacyComponentSerializer.legacy('&').deserialize("Sorry, the mojang servers are offline and we can't authenticate you with our own system!"));
-                this.velocityLoader.getLogger().warn("Internal error for " + event.getPlayer().getUsername() + ", preventing login.");
+                event.setGameProfile(new GameProfile(uuid, current.getName(), current.getProperties()));
+            } catch (Exception e) {
+                this.velocityLoader.getLogger().warn("Internal error for " + event.getGameProfile().getName() + "");
                 e.printStackTrace();
             }
-
-        } else {
-            // If we are not in mojang offline mode, update the player data
-            final String username = event.getPlayer().getUsername();
-            final String ip = event.getPlayer().getRemoteAddress().getAddress().getHostAddress();
-            final UUID uuid = event.getPlayer().getUniqueId();
-            this.velocityLoader.server.getScheduler().buildTask(this.velocityLoader, new Runnable() {
-                @Override
-                public void run() {
-                    VelocityListener.this.velocityLoader.getAOInstance().database.updatePlayer(username, ip, uuid);
-                }
-            }).schedule();
         }
     }
+
 }
