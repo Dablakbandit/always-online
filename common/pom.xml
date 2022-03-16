@@ -83,10 +83,7 @@
                 <filtering>true</filtering>
                 <directory>${basedir}/src/main/resources/</directory>
                 <includes>
-                    <include>bungee.yml</include>
-                    <include>config.properties</include>
-                    <include>plugin.yml</include>
-                    <include>**/*.java</include>
+                    <include>*</include>
                 </includes>
             </resource>
         </resources>
