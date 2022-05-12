@@ -127,7 +127,6 @@ public class AlwaysOnline implements IAlwaysOnline{
 		}else{
 			this.nativeExecutor.log(Level.INFO, "Loading file database...");
 			this.database = new FileDatabase(dataFolder.resolve("playerData.txt"));
-			
 		}
 		this.nativeExecutor.log(Level.INFO, "Database is ready to go!");
 		this.nativeExecutor.registerListener();
