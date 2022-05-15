@@ -75,4 +75,9 @@ public class BungeeLoader extends Plugin implements NativeExecutor{
 	public AlwaysOnline getAOInstance(){
 		return this.alwaysOnline;
 	}
+
+	@Override
+	public String getVersion() {
+		return getDescription().getVersion();
+	}
 }

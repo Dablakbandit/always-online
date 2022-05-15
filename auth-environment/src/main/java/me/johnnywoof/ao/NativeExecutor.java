@@ -27,5 +27,7 @@ public interface NativeExecutor{
 	void broadcastMessage(String message);
 	
 	IAlwaysOnline getAOInstance();
+
+	String getVersion();
 	
 }

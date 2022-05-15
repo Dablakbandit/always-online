@@ -114,4 +114,9 @@ public class VelocityLoader implements NativeExecutor {
     public AlwaysOnline getAOInstance() {
         return alwaysOnline;
     }
+
+    @Override
+    public String getVersion() {
+        return server.getPluginManager().getPlugin("alwaysonline").get().getDescription().getVersion().get();
+    }
 }

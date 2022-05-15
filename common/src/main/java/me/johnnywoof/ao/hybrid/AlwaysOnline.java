@@ -19,6 +19,7 @@ import me.johnnywoof.ao.NativeExecutor;
 import me.johnnywoof.ao.databases.Database;
 import me.johnnywoof.ao.databases.FileDatabase;
 import me.johnnywoof.ao.databases.MySQLDatabase;
+import me.johnnywoof.ao.update.UpdateChecker;
 import me.johnnywoof.ao.utils.CheckMethods;
 
 public class AlwaysOnline implements IAlwaysOnline{
@@ -47,6 +48,7 @@ public class AlwaysOnline implements IAlwaysOnline{
 				e.printStackTrace();
 			}
 		}
+		this.nativeExecutor.cancelTask(UpdateChecker.getInstance().getSchedule());
 	}
 	
 	public void reload(){
@@ -131,6 +133,8 @@ public class AlwaysOnline implements IAlwaysOnline{
 		this.nativeExecutor.log(Level.INFO, "Database is ready to go!");
 		this.nativeExecutor.registerListener();
 		this.nativeExecutor.runAsyncRepeating(new MojangSessionCheck(this), 0, checkInterval, TimeUnit.SECONDS);
+
+		UpdateChecker.getInstance().start(nativeExecutor);
 	}
 	
 	public void saveState(){

@@ -153,5 +153,10 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 	public AlwaysOnline getAOInstance(){
 		return this.alwaysOnline;
 	}
-	
+
+	@Override
+	public String getVersion() {
+		return getDescription().getVersion();
+	}
+
 }
