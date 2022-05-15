@@ -9,7 +9,10 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import me.johnnywoof.ao.NativeExecutor;
+import me.johnnywoof.ao.databases.Database;
+import me.johnnywoof.ao.databases.MySQLDatabase;
 import me.johnnywoof.ao.hybrid.AlwaysOnline;
+import me.johnnywoof.ao.velocity.metrics.Metrics;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.slf4j.Logger;
 
@@ -25,14 +28,16 @@ public class VelocityLoader implements NativeExecutor {
 
     public final AlwaysOnline alwaysOnline = new AlwaysOnline(this);
     public final ProxyServer server;
-    public final Logger logger;
-    public final Path dataDirectory;
+    private final Logger logger;
+    private final Path dataDirectory;
+    private final Metrics.Factory metricsFactory;
 
     @Inject
-    public VelocityLoader(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public VelocityLoader(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory, Metrics.Factory metricsFactory) {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
+        this.metricsFactory = metricsFactory;
     }
 
     public Logger getLogger() {
@@ -44,6 +49,15 @@ public class VelocityLoader implements NativeExecutor {
         this.alwaysOnline.reload();
         CommandMeta meta = this.server.getCommandManager().metaBuilder("alwaysonline").aliases("ao").build();
         this.server.getCommandManager().register(meta, new VelocityCommand(this));
+
+        Metrics metrics = metricsFactory.make(this, 15202);
+        Database database = alwaysOnline.getDatabase();
+        String databaseType = "FlatFile";
+        if(database instanceof MySQLDatabase){
+            databaseType = "MySQL";
+        }
+        String finalDatabaseType = databaseType;
+        metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> finalDatabaseType));
     }
 
     private AtomicInteger taskCounter = new AtomicInteger(0);

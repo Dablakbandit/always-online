@@ -150,5 +150,8 @@ public class AlwaysOnline implements IAlwaysOnline{
 		this.nativeExecutor.log(Level.INFO, "Mojang offline mode: " + MOJANG_OFFLINE_MODE);
 		this.nativeExecutor.log(Level.INFO, "Check status: " + CHECK_SESSION_STATUS);
 	}
-	
+
+	public Database getDatabase() {
+		return database;
+	}
 }

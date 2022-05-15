@@ -4,7 +4,10 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import me.johnnywoof.ao.databases.Database;
+import me.johnnywoof.ao.databases.MySQLDatabase;
 import me.johnnywoof.ao.spigot.authservices.NMSAuthSetup;
+import me.johnnywoof.ao.spigot.metrics.Metrics;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -41,6 +44,15 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 			this.getLogger().severe("If this issue persists, please contact the author (" + this.getDescription().getAuthors() + ") and remove " + this.getDescription().getName() + " from your server temporarily.");
 			this.getServer().shutdown();
 		}
+
+		Metrics metrics = new Metrics(this, 15201);
+		Database database = alwaysOnline.getDatabase();
+		String databaseType = "FlatFile";
+		if(database instanceof MySQLDatabase){
+			databaseType = "MySQL";
+		}
+		String finalDatabaseType = databaseType;
+		metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> finalDatabaseType));
 	}
 	
 	@Override

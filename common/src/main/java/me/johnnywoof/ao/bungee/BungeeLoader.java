@@ -5,6 +5,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import me.johnnywoof.ao.NativeExecutor;
+import me.johnnywoof.ao.bungee.metrics.Metrics;
+import me.johnnywoof.ao.databases.Database;
+import me.johnnywoof.ao.databases.MySQLDatabase;
 import me.johnnywoof.ao.hybrid.AlwaysOnline;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -19,6 +22,15 @@ public class BungeeLoader extends Plugin implements NativeExecutor{
 		this.alwaysOnline.reload();
 		// Execute native setup
 		this.getProxy().getPluginManager().registerCommand(this, new BungeeCommand(this));
+
+		Metrics metrics = new Metrics(this, 15200);
+		Database database = alwaysOnline.getDatabase();
+		String databaseType = "FlatFile";
+		if(database instanceof MySQLDatabase){
+			databaseType = "MySQL";
+		}
+		String finalDatabaseType = databaseType;
+		metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> finalDatabaseType));
 	}
 	
 	@Override
