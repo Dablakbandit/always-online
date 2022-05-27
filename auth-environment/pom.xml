@@ -20,10 +20,6 @@
 
     <repositories>
         <repository>
-            <id>file</id>
-            <url>file://E:/Users/ashle/.m2/repository</url>
-        </repository>
-        <repository>
             <id>everything</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
