@@ -1,6 +1,6 @@
 *.iml
 target/*
 .idea/*
-*.xml
+*dependency-reduced-pom.xml
 common/target/*
 auth-environment/target/*

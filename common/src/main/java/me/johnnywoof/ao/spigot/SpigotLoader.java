@@ -123,7 +123,9 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 	
 	@Override
 	public void cancelTask(int taskID){
-		this.getServer().getScheduler().cancelTask(taskID);
+		if(taskID != -1) {
+			this.getServer().getScheduler().cancelTask(taskID);
+		}
 	}
 	
 	@Override

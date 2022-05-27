@@ -1,0 +1,47 @@
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+        <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>me.dablakbandit</groupId>
+        <artifactId>always-online</artifactId>
+        <version>6.1.9</version>
+    </parent>
+
+    <artifactId>auth-environment</artifactId>
+    <version>6.1.9</version>
+    <name>auth-environment</name>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bukkit.version>1.16.4-R0.1-SNAPSHOT</bukkit.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.assembly.plugin.version>2.4</maven.assembly.plugin.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>file</id>
+            <url>file://E:/Users/ashle/.m2/repository</url>
+        </repository>
+        <repository>
+            <id>everything</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>${bukkit.version}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <defaultGoal>clean package compile</defaultGoal>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    </build>
+
+
+
+</project>

@@ -45,7 +45,9 @@ public class BungeeLoader extends Plugin implements NativeExecutor{
 	
 	@Override
 	public void cancelTask(int taskID){
-		this.getProxy().getScheduler().cancel(taskID);
+		if(taskID != -1) {
+			this.getProxy().getScheduler().cancel(taskID);
+		}
 	}
 	
 	@Override
