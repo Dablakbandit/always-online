@@ -59,7 +59,7 @@ public class CheckMethods{
 		}
 		
 		if(serverResponseStream == null)
-			return "";
+			return "{}";
 		COOKIE_MANAGER.put(uri, con.getHeaderFields());
 		BufferedReader in = new BufferedReader(new InputStreamReader(serverResponseStream));
 		String inputLine;

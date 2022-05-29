@@ -5,6 +5,7 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
@@ -16,7 +17,9 @@ import me.johnnywoof.ao.velocity.metrics.Metrics;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +49,7 @@ public class VelocityLoader implements NativeExecutor {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        loadLibs();
         this.alwaysOnline.reload();
         CommandMeta meta = this.server.getCommandManager().metaBuilder("alwaysonline").aliases("ao").build();
         this.server.getCommandManager().register(meta, new VelocityCommand(this));
@@ -58,6 +62,23 @@ public class VelocityLoader implements NativeExecutor {
         }
         String finalDatabaseType = databaseType;
         metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> finalDatabaseType));
+    }
+
+    private void loadLibs() {
+        File libsFolder = new File(this.dataFolder().toFile(), "/libs/");
+        if (!libsFolder.exists()) {
+            libsFolder.mkdirs();
+        }
+        for (File file : libsFolder.listFiles()) {
+            if (file.getName().endsWith(".jar")) {
+                logger.info(file.getName());
+                server.getPluginManager().addToClasspath(this, file.toPath());
+            }
+        }
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (Exception | Error e){
+        }
     }
 
     private AtomicInteger taskCounter = new AtomicInteger(0);
