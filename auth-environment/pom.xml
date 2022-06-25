@@ -4,11 +4,11 @@
     <parent>
         <groupId>me.dablakbandit</groupId>
         <artifactId>always-online</artifactId>
-        <version>6.1.9</version>
+        <version>6.2.0</version>
     </parent>
 
     <artifactId>auth-environment</artifactId>
-    <version>6.1.9</version>
+    <version>6.2.0</version>
     <name>auth-environment</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

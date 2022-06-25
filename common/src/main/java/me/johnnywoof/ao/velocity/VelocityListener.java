@@ -31,7 +31,7 @@ public class VelocityListener extends ProxyListener {
     // A high priority to allow other plugins to go first
     @Subscribe(order = PostOrder.LAST)
     public void onPreLogin(PreLoginEvent event) {
-        if (AlwaysOnline.MOJANG_OFFLINE_MODE) {// Make sure we are in mojang offline mode
+        if (velocityLoader.getAOInstance().getOfflineMode()) {// Make sure we are in mojang offline mode
             // Verify if the name attempting to connect is even verified
             if (!this.validate(event.getUsername())) {
                 event.setResult(PreLoginEvent.PreLoginComponentResult.denied(LegacyComponentSerializer.legacy('&').deserialize(this.velocityLoader.alwaysOnline.config.getProperty("message-kick-invalid", "Invalid username. Hacking?"))));
@@ -64,7 +64,7 @@ public class VelocityListener extends ProxyListener {
     // Set priority to highest to almost guaranteed to have our MOTD displayed
     @Subscribe(order = PostOrder.LAST)
     public void onPing(ProxyPingEvent event) {
-        if (AlwaysOnline.MOJANG_OFFLINE_MODE && this.MOTD != null) {
+        if (velocityLoader.getAOInstance().getOfflineMode() && this.MOTD != null) {
             ServerPing sp = event.getPing();
             TextComponent component = LegacyComponentSerializer.legacy('&').deserialize(this.MOTD);
             ServerPing serverPing = sp.asBuilder().description(component).build();
@@ -74,7 +74,7 @@ public class VelocityListener extends ProxyListener {
 
     @Subscribe(order = PostOrder.LAST)
     public void onGameProfileRequest(GameProfileRequestEvent event) {
-        if (AlwaysOnline.MOJANG_OFFLINE_MODE) {
+        if (velocityLoader.getAOInstance().getOfflineMode()) {
             try {
                 GameProfile current = event.getGameProfile();
                 UUID uuid = this.velocityLoader.getAOInstance().database.getUUID(current.getName());

@@ -35,7 +35,7 @@ public class BungeeListener extends ProxyListener implements Listener{
 		// Make sure it is not canceled
 		if(event.isCancelled())
 			return;
-		if(AlwaysOnline.MOJANG_OFFLINE_MODE){// Make sure we are in mojang offline mode
+		if(bungeeLoader.getAOInstance().getOfflineMode()){// Make sure we are in mojang offline mode
 			// Verify if the name attempting to connect is even verified
 			if(!this.validate(event.getConnection().getName())){
 				event.setCancelReason(this.bungeeLoader.alwaysOnline.config.getProperty("message-kick-invalid", "Invalid username. Hacking?"));
@@ -70,7 +70,7 @@ public class BungeeListener extends ProxyListener implements Listener{
 	// Set priority to highest to almost guaranteed to have our MOTD displayed
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPing(ProxyPingEvent event){
-		if(AlwaysOnline.MOJANG_OFFLINE_MODE && this.MOTD != null){
+		if(bungeeLoader.getAOInstance().getOfflineMode() && this.MOTD != null){
 			ServerPing sp = event.getResponse();
 			sp.setDescription(this.MOTD);
 			event.setResponse(sp);
@@ -81,7 +81,7 @@ public class BungeeListener extends ProxyListener implements Listener{
 	// Set priority to lowest since we'll be needing to go first
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPost(PostLoginEvent event){
-		if(AlwaysOnline.MOJANG_OFFLINE_MODE){
+		if(bungeeLoader.getAOInstance().getOfflineMode()){
 			InitialHandler handler = (InitialHandler)event.getPlayer().getPendingConnection();
 			try{
 				UUID uuid = this.bungeeLoader.alwaysOnline.database.getUUID(event.getPlayer().getName());

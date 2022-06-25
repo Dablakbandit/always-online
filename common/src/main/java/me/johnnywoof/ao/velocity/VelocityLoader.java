@@ -154,4 +154,9 @@ public class VelocityLoader implements NativeExecutor {
     public String getVersion() {
         return server.getPluginManager().getPlugin("alwaysonline").get().getDescription().getVersion().get();
     }
+
+    @Override
+    public void notifyOfflineMode(boolean offlineMode) {
+
+    }
 }

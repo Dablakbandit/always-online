@@ -30,14 +30,14 @@ public class AOListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onMOTD(ServerListPingEvent event){
-		if(AlwaysOnline.MOJANG_OFFLINE_MODE && this.MOTD != null)
+		if(spigotLoader.getAOInstance().getOfflineMode() && this.MOTD != null)
 			event.setMotd(this.MOTD);
 	}
 	
 	// Low priority so that we can go first. ignoreCancelled is set to false to prevent some security concern.
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onAsyncPreLogin(AsyncPlayerPreLoginEvent event){
-		if(AlwaysOnline.MOJANG_OFFLINE_MODE){
+		if(spigotLoader.getAOInstance().getOfflineMode()){
 			String username = event.getName();
 			if(!this.validate(username)){
 				event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, this.spigotLoader.alwaysOnline.config.getProperty("message-kick-invalid", "Invalid username. Hacking?"));
@@ -59,7 +59,7 @@ public class AOListener implements Listener{
 	
 	@EventHandler
 	public void onPostLogin(PlayerJoinEvent event){
-		if(!AlwaysOnline.MOJANG_OFFLINE_MODE){
+		if(!spigotLoader.getAOInstance().getOfflineMode()){
 			final String username = event.getPlayer().getName();
 			final String ip = event.getPlayer().getAddress().getAddress().getHostAddress();
 			final UUID uuid = event.getPlayer().getUniqueId();

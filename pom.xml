@@ -4,7 +4,7 @@
     <groupId>me.dablakbandit</groupId>
     <artifactId>always-online</artifactId>
     <packaging>pom</packaging>
-    <version>6.1.9</version>
+    <version>6.2.0</version>
     <modules>
         <module>auth-environment</module>
         <module>common</module>

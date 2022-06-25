@@ -31,22 +31,23 @@ public class VelocityCommand implements SimpleCommand {
         if (args.length <= 0) {
             this.displayHelp(sender);
         } else {
+            AlwaysOnline alwaysOnline = ao.getAOInstance();
             switch (args[0].toLowerCase()) {
                 case "toggle":
-                    AlwaysOnline.MOJANG_OFFLINE_MODE = !AlwaysOnline.MOJANG_OFFLINE_MODE;
-                    sendMessage(sender, ChatColor.GOLD + "Mojang offline mode is now " + ((AlwaysOnline.MOJANG_OFFLINE_MODE ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled")) + ChatColor.GOLD + "!");
-                    if (!AlwaysOnline.MOJANG_OFFLINE_MODE) {
+                    alwaysOnline.toggleOfflineMode();
+                    sendMessage(sender, ChatColor.GOLD + "Mojang offline mode is now " + ((alwaysOnline.getOfflineMode() ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled")) + ChatColor.GOLD + "!");
+                    if (!alwaysOnline.getOfflineMode()) {
                         sendMessage(sender, ChatColor.GOLD + "AlwaysOnline will now treat the mojang servers as being online.");
                     } else {
                         sendMessage(sender, ChatColor.GOLD + "AlwaysOnline will no longer treat the mojang servers as being online.");
                     }
                     break;
                 case "disable":
-                    AlwaysOnline.CHECK_SESSION_STATUS = false;
+                    alwaysOnline.setCheckSessionStatus(false);
                     sendMessage(sender, ChatColor.GOLD + "AlwaysOnline has been disabled! AlwaysOnline will no longer check to see if the session server is offline.");
                     break;
                 case "enable":
-                    AlwaysOnline.CHECK_SESSION_STATUS = true;
+                    alwaysOnline.setCheckSessionStatus(true);
                     sendMessage(sender, ChatColor.GOLD + "AlwaysOnline has been enabled! AlwaysOnline will now check to see if the session server is offline.");
                     break;
                 case "reload":

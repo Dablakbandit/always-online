@@ -18,12 +18,14 @@ import java.util.logging.Level;
 
 public class NMSAuthEnvironmentService extends AuthEnvironmentService {
 
+	private final AlwaysOnline alwaysOnline;
 	private final Database database;
 	private final Method fillGameProfile;
 	private final Method fillProfileProperties;
 	
-	public NMSAuthEnvironmentService(Object oldSessionService, YggdrasilAuthenticationService authenticationService, Object enviroment, Database database){
+	public NMSAuthEnvironmentService(AlwaysOnline alwaysOnline, Object oldSessionService, YggdrasilAuthenticationService authenticationService, Object enviroment, Database database){
 		super(oldSessionService, authenticationService, enviroment);
+		this.alwaysOnline = alwaysOnline;
 		this.database = database;
 		this.fillGameProfile = NMSUtils.getMethod(oldSessionService.getClass(), "fillGameProfile", GameProfile.class, boolean.class);
 		this.fillProfileProperties = NMSUtils.getMethod(oldSessionService.getClass(), "fillProfileProperties", GameProfile.class, boolean.class);
@@ -54,7 +56,7 @@ public class NMSAuthEnvironmentService extends AuthEnvironmentService {
 	}
 	
 	public GameProfile hasJoinedServer(GameProfile user, String serverId, InetAddress address) throws AuthenticationUnavailableException{
-		if(AlwaysOnline.MOJANG_OFFLINE_MODE){
+		if(alwaysOnline.getOfflineMode()){
 			UUID uuid = this.database.getUUID(user.getName());
 			if(uuid != null){
 				return new GameProfile(uuid, user.getName());
@@ -68,7 +70,7 @@ public class NMSAuthEnvironmentService extends AuthEnvironmentService {
 	}
 	
 	public GameProfile hasJoinedServer(GameProfile user, String serverId) throws AuthenticationUnavailableException{
-		if(AlwaysOnline.MOJANG_OFFLINE_MODE){
+		if(alwaysOnline.getOfflineMode()){
 			UUID uuid = this.database.getUUID(user.getName());
 			if(uuid != null){
 				return new GameProfile(uuid, user.getName());

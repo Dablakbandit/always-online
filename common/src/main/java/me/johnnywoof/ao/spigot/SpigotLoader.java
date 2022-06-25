@@ -24,8 +24,6 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 	
 	@Override
 	public void onEnable(){
-		this.alwaysOnline.reload();
-		// Native enable setup
 		
 		if(!this.getServer().getOnlineMode()){
 			this.getLogger().info("This server is running in offline mode, so this plugin will have no use on this server!");
@@ -34,6 +32,8 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 			this.getPluginLoader().disablePlugin(this);
 			return;
 		}
+
+		this.alwaysOnline.reload();
 		
 		try{
 			this.getLogger().info("Setting up NMS authentication service...");
@@ -68,21 +68,20 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 			String pluginName = this.getDescription().getName();
 			switch(args[0].toLowerCase()){
 			case "toggle":
-				AlwaysOnline.MOJANG_OFFLINE_MODE = !AlwaysOnline.MOJANG_OFFLINE_MODE;
-				sender.sendMessage(ChatColor.GOLD + "Mojang offline mode is now " + ((AlwaysOnline.MOJANG_OFFLINE_MODE ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled")) + ChatColor.GOLD + "!");
-				if(!AlwaysOnline.MOJANG_OFFLINE_MODE){
+				alwaysOnline.toggleOfflineMode();
+				sender.sendMessage(ChatColor.GOLD + "Mojang offline mode is now " + ((alwaysOnline.getOfflineMode() ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled")) + ChatColor.GOLD + "!");
+				if(!alwaysOnline.getOfflineMode()){
 					sender.sendMessage(ChatColor.GOLD + pluginName + " will now treat the mojang servers as being online.");
 				}else{
 					sender.sendMessage(ChatColor.GOLD + pluginName + " will no longer treat the mojang servers as being online.");
-					
 				}
 				break;
 			case "disable":
-				AlwaysOnline.CHECK_SESSION_STATUS = false;
+				alwaysOnline.setCheckSessionStatus(false);
 				sender.sendMessage(ChatColor.GOLD + pluginName + " has been disabled! " + pluginName + " will no longer check to see if the session server is offline.");
 				break;
 			case "enable":
-				AlwaysOnline.CHECK_SESSION_STATUS = true;
+				alwaysOnline.setCheckSessionStatus(true);
 				sender.sendMessage(ChatColor.GOLD + pluginName + " has been enabled! " + pluginName + " will now check to see if the session server is offline.");
 				break;
 			case "reload":
@@ -171,6 +170,11 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor{
 	@Override
 	public String getVersion() {
 		return getDescription().getVersion();
+	}
+
+	@Override
+	public void notifyOfflineMode(boolean offlineMode) {
+		NMSAuthSetup.setOnlineMode(!offlineMode);
 	}
 
 }

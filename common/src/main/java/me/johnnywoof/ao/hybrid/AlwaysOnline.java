@@ -24,7 +24,7 @@ import me.johnnywoof.ao.utils.CheckMethods;
 
 public class AlwaysOnline implements IAlwaysOnline{
 	
-	public static boolean		MOJANG_OFFLINE_MODE	= false, CHECK_SESSION_STATUS = true;
+	private boolean				MOJANG_OFFLINE_MODE	= false, CHECK_SESSION_STATUS = true;
 	
 	public Database				database			= null;
 	public Properties			config;
@@ -39,6 +39,7 @@ public class AlwaysOnline implements IAlwaysOnline{
 	public void disable(){
 		if(this.database != null){
 			this.nativeExecutor.log(Level.INFO, "Saving data...");
+			this.nativeExecutor.cancelAllOurTasks();
 			try{
 				this.database.save();
 				this.nativeExecutor.log(Level.INFO, "Closing database connections/streams...");
@@ -134,6 +135,7 @@ public class AlwaysOnline implements IAlwaysOnline{
 		this.nativeExecutor.registerListener();
 		this.nativeExecutor.runAsyncRepeating(new MojangSessionCheck(this), 0, checkInterval, TimeUnit.SECONDS);
 
+		this.nativeExecutor.notifyOfflineMode(MOJANG_OFFLINE_MODE);
 		UpdateChecker.getInstance().start(nativeExecutor);
 	}
 	
@@ -153,5 +155,22 @@ public class AlwaysOnline implements IAlwaysOnline{
 
 	public Database getDatabase() {
 		return database;
+	}
+
+	public void toggleOfflineMode(){
+		MOJANG_OFFLINE_MODE = !MOJANG_OFFLINE_MODE;
+		this.nativeExecutor.notifyOfflineMode(MOJANG_OFFLINE_MODE);
+	}
+
+	public boolean getOfflineMode(){
+		return MOJANG_OFFLINE_MODE;
+	}
+
+	public void setCheckSessionStatus(boolean value){
+		CHECK_SESSION_STATUS = value;
+	}
+
+	public boolean getCheckSessionStatus() {
+		return CHECK_SESSION_STATUS;
 	}
 }

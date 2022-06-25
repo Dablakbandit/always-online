@@ -29,5 +29,7 @@ public interface NativeExecutor{
 	IAlwaysOnline getAOInstance();
 
 	String getVersion();
+
+	void notifyOfflineMode(boolean offlineMode);
 	
 }

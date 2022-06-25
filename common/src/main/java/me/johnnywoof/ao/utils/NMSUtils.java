@@ -598,7 +598,22 @@ public class NMSUtils {
 		}
 		return null;
 	}
-	
+
+	public static Constructor<?> getConstructor(Class<?> clazz, int argLength) throws Exception{
+		for(Constructor<?> c : clazz.getDeclaredConstructors())
+			if(c.getParameterTypes().length == argLength){
+				c.setAccessible(true);
+				return c;
+			}
+		for(Constructor<?> c : clazz.getConstructors())
+			if(c.getParameterTypes().length == argLength){
+				c.setAccessible(true);
+				return c;
+			}
+		throw new Exception("Constructor Not Found");
+	}
+
+
 	public static Constructor<?> getConstructorWithException(Class<?> clazz, Class<?>... args) throws Exception{
 		for(Constructor<?> c : clazz.getDeclaredConstructors())
 			if(args.length == 0 && c.getParameterTypes().length == 0 || ClassListEqual(args, c.getParameterTypes())){

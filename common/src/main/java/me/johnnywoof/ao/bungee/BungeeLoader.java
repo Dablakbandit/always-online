@@ -94,4 +94,9 @@ public class BungeeLoader extends Plugin implements NativeExecutor{
 	public String getVersion() {
 		return getDescription().getVersion();
 	}
+
+	@Override
+	public void notifyOfflineMode(boolean offlineMode) {
+
+	}
 }
