@@ -22,7 +22,7 @@ public class NMSAuthSetup {
     private static Method setUsesAuthentication = NMSUtils.getMethodSilent(classMinecraftServer, "setUsesAuthentication", boolean.class);
     private static Method getServer = NMSUtils.getMethod(classMinecraftServer, "getServer");
     private static Field sessionService = NMSUtils.getFirstFieldOfTypeSilent(classMinecraftServer, MinecraftSessionService.class);
-    private static Class<?> servicesClass = NMSUtils.getClass("net.minecraft.server.Services");
+    private static Class<?> servicesClass = NMSUtils.getClassSilent("net.minecraft.server.Services");
     private static Field fieldServices = NMSUtils.getFirstFieldOfTypeSilent(classMinecraftServer, servicesClass);
     private static Field servicesSessionService = NMSUtils.getFirstFieldOfTypeSilent(servicesClass, MinecraftSessionService.class);
 
