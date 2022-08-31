@@ -31,10 +31,10 @@ public class CheckMethods{
 		Type type = new TypeToken<Map<String, String>>(){
 		}.getType();
 		Map<String, String> data = gson.fromJson(serverResponse, type);
-		if(!data.containsKey("Status")){
+		if(!data.containsKey("id")){
 			return false;
 		}
-		return "OK".equals(data.get("Status"));
+		return "069a79f444e94726a5befca90e38aaf5".equals(data.get("id"));
 	}
 	
 	private static String sendGet(String url) throws IOException, URISyntaxException{
