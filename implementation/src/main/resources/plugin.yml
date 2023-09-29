@@ -1,0 +1,11 @@
+name: AlwaysOnline
+version: ${version}
+main: me.dablakbandit.ao.spigot.SpigotLoader
+authors: [Dablakbandit, Johnnywoof]
+website: https://www.spigotmc.org/resources/alwaysonline.66591/
+commands:
+  alwaysonline:
+    description: Base command for always online.
+    permission: alwaysonline.usage
+    usage: /alwaysonline
+    aliases: [ao]
