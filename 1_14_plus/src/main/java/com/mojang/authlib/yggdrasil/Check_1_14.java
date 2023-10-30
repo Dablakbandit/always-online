@@ -17,7 +17,7 @@ public class Check_1_14 {
     private static final Field authentificationService = NMSUtils.getFirstFieldOfTypeSilent(classMinecraftServer, YggdrasilAuthenticationService.class);
 
     public static boolean valid(){
-        return sessionService != null;
+        return sessionService != null && authentificationService != null;
     }
 
     public static void setup(IAlwaysOnline alwaysOnline) throws Exception{
