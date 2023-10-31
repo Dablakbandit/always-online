@@ -35,7 +35,12 @@ public class Check_1_16_4 {
 
     public static void setup(IAlwaysOnline alwaysOnline) throws Exception{
         Object ms = getServer.invoke(null);
-        YggdrasilMinecraftSessionService oldSessionService = (YggdrasilMinecraftSessionService)servicesSessionService.get(fieldServices.get(ms));
+        YggdrasilMinecraftSessionService oldSessionService;
+        if(sessionService != null){
+            oldSessionService = (YggdrasilMinecraftSessionService) sessionService.get(ms);
+        }else{
+            oldSessionService = (YggdrasilMinecraftSessionService) servicesSessionService.get(fieldServices.get(ms));
+        }
         YggdrasilAuthenticationService current = (YggdrasilAuthenticationService)baseAuthentificationService.get(oldSessionService);
         Object service = new NMSAuthEnvironmentService(alwaysOnline, oldSessionService, current, (Environment) environment.get(current), alwaysOnline.getDatabase());
         if(servicesClass == null){
