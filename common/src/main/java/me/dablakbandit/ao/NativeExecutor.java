@@ -31,5 +31,8 @@ public interface NativeExecutor{
 	String getVersion();
 
 	void notifyOfflineMode(boolean offlineMode);
-	
+
+	default void initMySQL(){
+
+	}
 }

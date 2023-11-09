@@ -16,8 +16,11 @@ import me.dablakbandit.ao.hybrid.AlwaysOnline;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.slf4j.Logger;
 
-import java.io.File;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -156,5 +159,74 @@ public class VelocityLoader implements NativeExecutor {
     @Override
     public void notifyOfflineMode(boolean offlineMode) {
 
+    }
+
+    private static final String MYSQL_SHA256 = "b5bf2f0987197c30adf74a9e419b89cda4c257da2d1142871f508416d5f2227a";
+
+    @Override
+    public void initMySQL() {
+        loadLibs();
+        try {
+            if (Class.forName("com.mysql.cj.jdbc.Driver") != null){
+                return;
+            }
+        } catch (Exception | Error e){
+        }
+
+        String url = "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar";
+
+        File libsFolder = new File(this.dataFolder().toFile(), "/libs/");
+        File libFile = new File(libsFolder, "mysql-connector-j-8.0.33.jar");
+        try {
+
+            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.setDoOutput(false);
+            httpURLConnection.connect();
+
+            int repCode = httpURLConnection.getResponseCode();
+
+            if (repCode == 200) {
+                try (InputStream inputStream = httpURLConnection.getInputStream(); FileOutputStream fileOutputStream = new FileOutputStream(libFile)) {
+                    byte[] b = new byte[1024];
+                    int n;
+                    while ((n = inputStream.read(b)) != -1) {
+                        fileOutputStream.write(b, 0, n);
+                    }
+                    fileOutputStream.flush();
+                }
+                if (!sha1(libFile).equals("9e64d997873abc4318620264703d3fdb6b02dd5a")) {
+                    libFile.delete();
+                    getLogger().error("Failed to download mysql driver");
+                }else{
+                    logger.info(libFile.getName());
+                    server.getPluginManager().addToClasspath(this, libFile.toPath());
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private String sha1(File file) throws Exception {
+        try (FileInputStream fis = new FileInputStream(file);
+             ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();) {
+            byte[] buff = new byte[1024];
+            int n;
+            while ((n = fis.read(buff)) > 0) {
+                arrayOutputStream.write(buff, 0, n);
+            }
+            final byte[] digest = MessageDigest.getInstance("SHA-1").digest(arrayOutputStream.toByteArray());
+            StringBuilder sb = new StringBuilder();
+            for (byte aByte : digest) {
+                String temp = Integer.toHexString((aByte & 0xFF));
+                if (temp.length() == 1) {
+                    sb.append("0");
+                }
+                sb.append(temp);
+            }
+            return sb.toString();
+        }
     }
 }
