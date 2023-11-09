@@ -161,8 +161,6 @@ public class VelocityLoader implements NativeExecutor {
 
     }
 
-    private static final String MYSQL_SHA256 = "b5bf2f0987197c30adf74a9e419b89cda4c257da2d1142871f508416d5f2227a";
-
     @Override
     public void initMySQL() {
         loadLibs();
