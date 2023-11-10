@@ -5,7 +5,7 @@
     <artifactId>always-online</artifactId>
     <packaging>pom</packaging>
     <properties>
-        <ao-version>6.2.2</ao-version>
+        <ao-version>6.2.3</ao-version>
     </properties>
     <version>1.0.0</version>
     <modules>
