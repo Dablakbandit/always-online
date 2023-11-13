@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-@Plugin(id = "alwaysonline", name = "Always Online", version = "${version}", url = "https://www.spigotmc.org/resources/alwaysonline.66591/", description = "Keep your server running while mojang is offline, Supports all server versions!", authors = "Dablakbandit")
+@Plugin(id = "alwaysonline", name = "Always Online", version = "6.2.3", url = "https://www.spigotmc.org/resources/alwaysonline.66591/", description = "Keep your server running while mojang is offline, Supports all server versions!", authors = "Dablakbandit")
 public class VelocityLoader implements NativeExecutor {
 
     public final AlwaysOnline alwaysOnline = new AlwaysOnline(this);
@@ -78,12 +78,12 @@ public class VelocityLoader implements NativeExecutor {
         }
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (Exception | Error e){
+        } catch (Exception | Error ignored){
         }
     }
 
-    private AtomicInteger taskCounter = new AtomicInteger(0);
-    private Map<Integer, ScheduledTask> scheduledTasks = new HashMap<>();
+    private final AtomicInteger taskCounter = new AtomicInteger(0);
+    private final Map<Integer, ScheduledTask> scheduledTasks = new HashMap<>();
 
     @Override
     public int runAsyncRepeating(Runnable runnable, long delay, long period, TimeUnit timeUnit) {
@@ -165,10 +165,9 @@ public class VelocityLoader implements NativeExecutor {
     public void initMySQL() {
         loadLibs();
         try {
-            if (Class.forName("com.mysql.cj.jdbc.Driver") != null){
-                return;
-            }
-        } catch (Exception | Error e){
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            return;
+        } catch (Exception | Error ignored){
         }
 
         String url = "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar";

@@ -41,7 +41,7 @@ public class UpdateChecker{
 			int new_version_number = Integer.parseInt(new_version .replaceAll("[^0-9]", ""));
 			if(new_version_number > latestVersion){
 				latest = new_version;
-				nativeExecutor.log(Level.INFO, "Plugin AlwaysOnline has been updated to v" + new_version + ", please restart your server.");
+				nativeExecutor.log(Level.INFO, "Plugin AlwaysOnline has been updated to v" + new_version + ", please update your server.");
 			}
 		}catch(Exception e){
 			nativeExecutor.log(Level.WARNING, "Unable to check update for AlwaysOnline v" + latest);

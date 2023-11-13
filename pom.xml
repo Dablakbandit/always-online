@@ -6,6 +6,8 @@
     <packaging>pom</packaging>
     <properties>
         <ao-version>6.2.3</ao-version>
+        <version>${ao-version}</version>
+        <comment>SEARCH AND REPLACE VERSION IN CODE BASE (velocity)</comment>
     </properties>
     <version>1.0.0</version>
     <modules>

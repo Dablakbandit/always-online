@@ -72,7 +72,7 @@ public class VelocityCommand implements SimpleCommand {
 
     private void displayHelp(CommandSource source) {
 
-       sendMessage(source, ChatColor.GOLD + "" + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GOLD + "[" + ChatColor.DARK_GREEN + "AlwaysOnline " + ChatColor.GRAY + "${version}" + ChatColor.GOLD + "]" + ChatColor.GOLD + ""
+       sendMessage(source, ChatColor.GOLD + "" + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GOLD + "[" + ChatColor.DARK_GREEN + "AlwaysOnline " + ChatColor.GRAY + ao.getVersion() + ChatColor.GOLD + "]" + ChatColor.GOLD + ""
         + ChatColor.STRIKETHROUGH + "----------");
        sendMessage(source, ChatColor.GOLD + "/alwaysonline toggle - " + ChatColor.DARK_GREEN + "Toggles between mojang online mode");
        sendMessage(source, ChatColor.GOLD + "/alwaysonline enable - " + ChatColor.DARK_GREEN + "Enables the plugin");
