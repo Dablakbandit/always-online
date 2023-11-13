@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-@Plugin(id = "alwaysonline", name = "Always Online", version = "6.2.3", url = "https://www.spigotmc.org/resources/alwaysonline.66591/", description = "Keep your server running while mojang is offline, Supports all server versions!", authors = "Dablakbandit")
+@Plugin(id = "alwaysonline", name = "Always Online", version = "6.2.4", url = "https://www.spigotmc.org/resources/alwaysonline.66591/", description = "Keep your server running while mojang is offline, Supports all server versions!", authors = "Dablakbandit")
 public class VelocityLoader implements NativeExecutor {
 
     public final AlwaysOnline alwaysOnline = new AlwaysOnline(this);
