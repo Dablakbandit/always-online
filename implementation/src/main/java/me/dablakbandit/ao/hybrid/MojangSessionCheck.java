@@ -42,7 +42,7 @@ public class MojangSessionCheck implements Runnable{
 		if(!alwaysOnline.getCheckSessionStatus())
 			return;
 		int downServiceReport = 0;
-		if(this.useHeadSessionServer && !CheckMethods.directSessionServerStatus(this.gson))
+		if(this.useHeadSessionServer && !CheckMethods.directSessionServerStatus(alwaysOnline, this.gson))
 			downServiceReport++;
 		if(downServiceReport >= this.totalCheckMethods){// Offline
 			if(!alwaysOnline.getOfflineMode()){

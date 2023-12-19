@@ -8,33 +8,35 @@ import java.lang.reflect.Type;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import me.dablakbandit.ao.hybrid.IAlwaysOnline;
 
 public class CheckMethods{
 	
 	private static final CookieHandler COOKIE_MANAGER = new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER);
 	
-	public static boolean directSessionServerStatus(Gson gson){
+	public static boolean directSessionServerStatus(IAlwaysOnline alwaysOnline, Gson gson){
 		String serverResponse = "{}";
 		try{
-			serverResponse = sendGet("https://authserver.mojang.com/");
+			serverResponse = sendGet("https://sessionserver.mojang.com/session/minecraft/profile/069a79f444e94726a5befca90e38aaf5");
 			if(serverResponse.isEmpty())
 				return false;
 		}catch(IOException | URISyntaxException e){
 			return false;
 		}
-		Type type = new TypeToken<Map<String, String>>(){
+		Type type = new TypeToken<Map<String, Object>>(){
 		}.getType();
 		Map<String, String> data = gson.fromJson(serverResponse, type);
-		if(!data.containsKey("Status")){
+		if(!data.containsKey("id")){
 			return false;
 		}
-		return "OK".equals(data.get("Status"));
+		return "069a79f444e94726a5befca90e38aaf5".equals(data.get("id"));
 	}
 	
 	private static String sendGet(String url) throws IOException, URISyntaxException{
