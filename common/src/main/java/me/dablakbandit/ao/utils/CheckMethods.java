@@ -22,7 +22,7 @@ public class CheckMethods{
 	public static boolean directSessionServerStatus(Gson gson){
 		String serverResponse = "{}";
 		try{
-			serverResponse = sendGet("https://sessionserver.mojang.com/session/minecraft/profile/069a79f444e94726a5befca90e38aaf5");
+			serverResponse = sendGet("https://authserver.mojang.com/");
 			if(serverResponse.isEmpty())
 				return false;
 		}catch(IOException | URISyntaxException e){
@@ -31,10 +31,10 @@ public class CheckMethods{
 		Type type = new TypeToken<Map<String, String>>(){
 		}.getType();
 		Map<String, String> data = gson.fromJson(serverResponse, type);
-		if(!data.containsKey("id")){
+		if(!data.containsKey("Status")){
 			return false;
 		}
-		return "069a79f444e94726a5befca90e38aaf5".equals(data.get("id"));
+		return "OK".equals(data.get("Status"));
 	}
 	
 	private static String sendGet(String url) throws IOException, URISyntaxException{
@@ -43,7 +43,7 @@ public class CheckMethods{
 		
 		HttpURLConnection con = (HttpURLConnection)obj.openConnection();
 		con.setDefaultUseCaches(false);
-		con.setRequestMethod("POST");
+		con.setRequestMethod("GET");
 		con.setRequestProperty("Accept", "application/json,text/html");
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 		con.setRequestProperty("Connection", "close");
