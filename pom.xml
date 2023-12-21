@@ -5,8 +5,8 @@
     <artifactId>always-online</artifactId>
     <packaging>pom</packaging>
     <properties>
-        <ao-version>6.2.7</ao-version>
-        <version>6.2.7</version>
+        <ao-version>6.2.8</ao-version>
+        <version>6.2.8</version>
         <comment>SEARCH AND REPLACE VERSION IN CODE BASE (velocity)</comment>
     </properties>
     <version>1.0.0</version>

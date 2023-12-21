@@ -2,15 +2,17 @@ package me.dablakbandit.ao.bungee;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import me.dablakbandit.ao.proxy.ProxyListener;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.PreLoginEvent;
-import net.md_5.bungee.api.event.ProxyPingEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.event.EventHandler;
@@ -29,7 +31,7 @@ public class BungeeListener extends ProxyListener implements Listener{
 	}
 	
 	// A high priority to allow other plugins to go first
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = 65)
 	public void onPreLogin(PreLoginEvent event){
 		// Make sure it is not canceled
 		if(event.isCancelled())
@@ -56,6 +58,8 @@ public class BungeeListener extends ProxyListener implements Listener{
 				if(ip.equals(lastip)){// If it matches set handler to offline mode, so it does not authenticate player with mojang
 					this.bungeeLoader.getLogger().info("Skipping session login for player " + event.getConnection().getName() + " [Connected ip: " + ip + ", Last ip: " + lastip + "]!");
 					handler.setOnlineMode(false);
+					UUID uuid = this.bungeeLoader.alwaysOnline.database.getUUID(event.getConnection().getName());
+					handler.setUniqueId(uuid);
 				}else{// Deny the player from joining
 					this.bungeeLoader.getLogger().info("Denied " + event.getConnection().getName() + " from logging in cause their ip [" + ip + "] does not match their last ip!");
 					handler.setOnlineMode(true);
@@ -78,49 +82,20 @@ public class BungeeListener extends ProxyListener implements Listener{
 	
 	@SuppressWarnings("deprecation")
 	// Set priority to lowest since we'll be needing to go first
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = -65)
 	public void onPost(PostLoginEvent event){
-		if(bungeeLoader.getAOInstance().getOfflineMode()){
-			InitialHandler handler = (InitialHandler)event.getPlayer().getPendingConnection();
-			try{
-				UUID uuid = this.bungeeLoader.alwaysOnline.database.getUUID(event.getPlayer().getName());
-				// Reflection
-				Field sf = handler.getClass().getDeclaredField("uniqueId");
-				sf.setAccessible(true);
-				sf.set(handler, uuid);
-				
-				sf = handler.getClass().getDeclaredField("offlineId");
-				sf.setAccessible(true);
-				sf.set(handler, uuid);
-				
-				Collection<String> g = this.bungeeLoader.getProxy().getConfigurationAdapter().getGroups(event.getPlayer().getName());
-				g.addAll(this.bungeeLoader.getProxy().getConfigurationAdapter().getGroups(event.getPlayer().getUniqueId().toString()));
-				
-				UserConnection userConnection = (UserConnection)event.getPlayer();
-				for(String s : g){
-					userConnection.addGroups(s);
-				}
-				this.bungeeLoader.getLogger().info(event.getPlayer().getName() + " successfully logged in while mojang servers were offline!");
-				// ProxyServer.getInstance().getLogger().info("Overriding uuid for " + event.getPlayer().getName() + " to " + uuid.toString() + "! New uuid is " + event.getPlayer().getUniqueId().toString());
-			}catch(Exception e){// Play it safe, if an error deny the player
-				event.getPlayer().disconnect("Sorry, the mojang servers are offline and we can't authenticate you with our own system!");
-				this.bungeeLoader.getLogger().warning("Internal error for " + event.getPlayer().getName() + ", preventing login.");
-				e.printStackTrace();
-			}
-			
-		}else{
-			// If we are not in mojang offline mode, update the player data
-			final String username = event.getPlayer().getName();
-			final String ip = event.getPlayer().getAddress().getAddress().getHostAddress();
-			final UUID uuid = event.getPlayer().getUniqueId();
-			this.bungeeLoader.getProxy().getScheduler().runAsync(this.bungeeLoader, new Runnable(){
-				@Override
-				public void run(){
-					BungeeListener.this.bungeeLoader.alwaysOnline.database.updatePlayer(username, ip, uuid);
-				}
-			});
-		}
-	}
+        if (!bungeeLoader.getAOInstance().getOfflineMode()) {
+            // If we are not in mojang offline mode, update the player data
+            final String username = event.getPlayer().getName();
+            final String ip = event.getPlayer().getAddress().getAddress().getHostAddress();
+            final UUID uuid = event.getPlayer().getUniqueId();
+            this.bungeeLoader.getProxy().getScheduler().runAsync(this.bungeeLoader, new Runnable(){
+                @Override
+                public void run(){
+                    BungeeListener.this.bungeeLoader.alwaysOnline.database.updatePlayer(username, ip, uuid);
+                }
+            });
+        }
+    }
 
-	
 }
