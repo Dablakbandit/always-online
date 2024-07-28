@@ -24,7 +24,7 @@ import me.dablakbandit.ao.utils.CheckMethods;
 
 public class AlwaysOnline implements IAlwaysOnline{
 	
-	private boolean				MOJANG_OFFLINE_MODE	= false, CHECK_SESSION_STATUS = true;
+	private boolean				MOJANG_OFFLINE_MODE	= false, CHECK_SESSION_STATUS = true, DEBUG = false;
 	
 	public Database database			= null;
 	public Properties			config;
@@ -152,6 +152,10 @@ public class AlwaysOnline implements IAlwaysOnline{
 		this.nativeExecutor.log(Level.INFO, "Session HEAD check: " + CheckMethods.directSessionServerStatus(this, new Gson()));
 		this.nativeExecutor.log(Level.INFO, "Mojang offline mode: " + MOJANG_OFFLINE_MODE);
 		this.nativeExecutor.log(Level.INFO, "Check status: " + CHECK_SESSION_STATUS);
+		this.DEBUG = !DEBUG;
+		if(DEBUG) {
+			this.nativeExecutor.log(Level.INFO, "Debug mode enabled!");
+		}
 	}
 
 	public Database getDatabase() {
@@ -177,5 +181,13 @@ public class AlwaysOnline implements IAlwaysOnline{
 
 	public NativeExecutor getNativeExecutor() {
 		return nativeExecutor;
+	}
+
+	public boolean isDebug(){
+		return DEBUG;
+	}
+
+	public void setDebug(boolean debug){
+		DEBUG = debug;
 	}
 }

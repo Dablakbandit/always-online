@@ -1,5 +1,6 @@
 package me.dablakbandit.ao.databases;
 
+import java.net.InetAddress;
 import java.util.UUID;
 
 public interface Database{
@@ -34,5 +35,14 @@ public interface Database{
 	 * This method does not save any data
 	 */
 	void close();
+
+	default boolean isValidIP(String ip) {
+		try {
+			InetAddress.getByName(ip);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 	
 }

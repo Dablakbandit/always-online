@@ -1,6 +1,6 @@
 package me.dablakbandit.ao.bungee;
 
-import java.util.logging.Level;
+import java.util.UUID;
 
 import me.dablakbandit.ao.hybrid.AlwaysOnline;
 import net.md_5.bungee.api.ChatColor;
@@ -49,7 +49,24 @@ public class BungeeCommand extends Command{
 				break;
 			case "resetcache":
 				this.ao.alwaysOnline.database.resetCache();
-				this.ao.alwaysOnline.nativeExecutor.log(Level.INFO, "Cache reset'd");
+				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "AlwaysOnline cache reset'd"));
+				break;
+			case "updateip":
+				if(args.length == 3) {
+					UUID uuid = this.ao.alwaysOnline.database.getUUID(args[1]);
+					if(uuid == null){
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "AlwaysOnline player " + args[1] + " not found in database"));
+						return;
+					}
+					if(!this.ao.alwaysOnline.database.isValidIP(args[2])){
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "AlwaysOnline " + args[2] + " is not a valid IP"));
+						return;
+					}
+					this.ao.alwaysOnline.database.updatePlayer(args[1], args[2], uuid);
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "AlwaysOnline updated " + args[1] + " to " + args[2]));
+				}else {
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "Usage: /alwaysonline updateip <username> <ip>"));
+				}
 				break;
 			default:
 				this.displayHelp(sender);
@@ -68,6 +85,8 @@ public class BungeeCommand extends Command{
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "/alwaysonline enable - " + ChatColor.DARK_GREEN + "Enables the plugin"));
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "/alwaysonline disable - " + ChatColor.DARK_GREEN + "Disables the plugin"));
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "/alwaysonline reload - " + ChatColor.DARK_GREEN + "Reloads the configuration file"));
+		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "/alwaysonline resetcache - " + ChatColor.DARK_GREEN + "Clear database cache"));
+		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "/alwaysonline updateip <username> <ip> - " + ChatColor.DARK_GREEN + "Update a users ip in the database"));
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GOLD + "" + ChatColor.STRIKETHROUGH + "------------------------------"));
 	}
 	

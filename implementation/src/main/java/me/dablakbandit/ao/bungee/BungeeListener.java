@@ -56,16 +56,37 @@ public class BungeeListener extends ProxyListener implements Listener{
 				this.bungeeLoader.getLogger().info("Denied " + event.getConnection().getName() + " from logging in cause their ip [" + ip + "] has never connected to this server before!");
 			}else{
 				if(ip.equals(lastip)){// If it matches set handler to offline mode, so it does not authenticate player with mojang
+					boolean onlineMode = handler.isOnlineMode();
 					this.bungeeLoader.getLogger().info("Skipping session login for player " + event.getConnection().getName() + " [Connected ip: " + ip + ", Last ip: " + lastip + "]!");
 					handler.setOnlineMode(false);
 					UUID uuid = this.bungeeLoader.alwaysOnline.database.getUUID(event.getConnection().getName());
 					handler.setUniqueId(uuid);
+					handler.setOnlineMode(onlineMode);
 				}else{// Deny the player from joining
 					this.bungeeLoader.getLogger().info("Denied " + event.getConnection().getName() + " from logging in cause their ip [" + ip + "] does not match their last ip!");
 					handler.setOnlineMode(true);
 					event.setCancelReason(this.bungeeLoader.alwaysOnline.config.getProperty("message-kick-ip", "We can not let you join since you are not on the same computer you logged on before!"));
 					event.setCancelled(true);
 				}
+			}
+		}
+	}
+
+	@EventHandler(priority = -65)
+	public void onLogin(LoginEvent event){
+		if(event.isCancelled())
+			return;
+		if(bungeeLoader.getAOInstance().getOfflineMode()) {// Make sure we are in mojang offline mode
+			InitialHandler handler = (InitialHandler)event.getConnection();
+			UUID uuid = this.bungeeLoader.alwaysOnline.database.getUUID(event.getConnection().getName());
+			if(!uuid.equals(handler.getUniqueId())){
+				this.bungeeLoader.getLogger().info("Updating Login UUID for " + event.getConnection().getName() + " to " + uuid.toString() + "!");
+				boolean onlineMode = handler.isOnlineMode();
+				handler.setOnlineMode(false);
+				handler.setUniqueId(uuid);
+				handler.setOnlineMode(onlineMode);
+			}else{
+				this.bungeeLoader.getLogger().info("Login UUID for " + event.getConnection().getName() + " is already set to " + uuid.toString() + "!");
 			}
 		}
 	}

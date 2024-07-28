@@ -1,6 +1,7 @@
 package me.dablakbandit.ao.spigot;
 
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -62,7 +63,7 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
-		if(args.length != 1){
+		if(args.length == 0){
 			this.displayHelp(sender);
 		}else{
 			String pluginName = this.getDescription().getName();
@@ -95,7 +96,24 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor {
 				break;
 			case "resetcache":
 				this.alwaysOnline.database.resetCache();
-				this.getLogger().info("Cache reset'd");
+				sender.sendMessage(ChatColor.GREEN + "AlwaysOnline cache reset'd");
+				break;
+			case "updateip":
+				if(args.length == 3) {
+					UUID uuid = this.alwaysOnline.database.getUUID(args[1]);
+					if(uuid == null){
+						sender.sendMessage(ChatColor.GREEN + "AlwaysOnline player " + args[1] + " not found in database");
+						break;
+					}
+					if(!this.alwaysOnline.database.isValidIP(args[2])){
+						sender.sendMessage(ChatColor.GREEN + "AlwaysOnline " + args[2] + " is not a valid IP");
+						break;
+					}
+					this.alwaysOnline.database.updatePlayer(args[1], args[2], uuid);
+					sender.sendMessage(ChatColor.GREEN +  "AlwaysOnline updated " + args[1] + " to " + args[2]);
+				}else {
+					sender.sendMessage(ChatColor.GREEN +  "Usage: /alwaysonline updateip <username> <ip>");
+				}
 				break;
 			default:
 				this.displayHelp(sender);
@@ -112,6 +130,9 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor {
 		sender.sendMessage(ChatColor.GOLD + "/alwaysonline toggle - " + ChatColor.DARK_GREEN + "Toggles between mojang online mode");
 		sender.sendMessage(ChatColor.GOLD + "/alwaysonline enable - " + ChatColor.DARK_GREEN + "Enables the plugin");
 		sender.sendMessage(ChatColor.GOLD + "/alwaysonline disable - " + ChatColor.DARK_GREEN + "Disables the plugin");
+		sender.sendMessage(ChatColor.GOLD + "/alwaysonline reload - " + ChatColor.DARK_GREEN + "Reloads the configuration file");
+		sender.sendMessage(ChatColor.GOLD + "/alwaysonline resetcache - " + ChatColor.DARK_GREEN + "Clear database cache");
+		sender.sendMessage(ChatColor.GOLD + "/alwaysonline updateip <username> <ip> - " + ChatColor.DARK_GREEN + "Update a users ip in the database");
 		sender.sendMessage(ChatColor.GOLD + "" + ChatColor.STRIKETHROUGH + "------------------------------");
 	}
 	
@@ -125,7 +146,7 @@ public class SpigotLoader extends JavaPlugin implements NativeExecutor {
 		if(taskID != -1) {
 			try{
 				this.getServer().getScheduler().cancelTask(taskID);
-			}catch (Exception e){
+			}catch (Exception ignored){
 
 			}
 		}

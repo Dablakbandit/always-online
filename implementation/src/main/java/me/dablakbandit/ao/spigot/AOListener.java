@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import me.dablakbandit.ao.spigot.authservices.NMSAuthSetup;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

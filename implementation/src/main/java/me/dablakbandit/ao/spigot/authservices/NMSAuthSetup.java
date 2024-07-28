@@ -6,6 +6,7 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.*;
 import me.dablakbandit.ao.utils.NMSUtils;
 import me.dablakbandit.ao.spigot.SpigotLoader;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -23,6 +24,8 @@ public class NMSAuthSetup {
 
     private static Class<?> servicesClass = NMSUtils.getClassSilent("net.minecraft.server.Services");
 
+    private static boolean disableOnlineMode = true;
+
 
 
     public static void setUp(SpigotLoader spigotLoader) throws Exception {
@@ -35,11 +38,12 @@ public class NMSAuthSetup {
         }else{
             spigotLoader.log(Level.INFO, "Attempting setup 1.20+ Auth service");
             Check_1_20_2.setup(spigotLoader.getAOInstance());
+            disableOnlineMode = false;
         }
     }
 
     public static void setOnlineMode(boolean onlineMode){
-        if(servicesClass != null && setUsesAuthentication != null){
+        if(servicesClass != null && setUsesAuthentication != null && disableOnlineMode){
             try {
                 Object ms = getServer.invoke(null);
                 setUsesAuthentication.invoke(ms, onlineMode);
@@ -48,5 +52,7 @@ public class NMSAuthSetup {
             }
         }
     }
+
+
 
 }

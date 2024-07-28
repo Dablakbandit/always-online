@@ -5,6 +5,7 @@ import me.dablakbandit.ao.databases.Database;
 
 public interface IAlwaysOnline {
     boolean getOfflineMode();
+    boolean isDebug();
 
     NativeExecutor getNativeExecutor();
 

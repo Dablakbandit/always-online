@@ -1,5 +1,9 @@
 package com.mojang.authlib.yggdrasil;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mojang.authlib.Environment;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
@@ -11,13 +15,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.Proxy;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class NMSAuthSessionService extends YggdrasilMinecraftSessionService {
 
 	private final IAlwaysOnline alwaysOnline;
 	private final Database database;
+	private final Cache<UUID, Optional<ProfileResult>> uuidNameCache;
 
 	private final YggdrasilMinecraftSessionService oldSessionService;
 
@@ -31,6 +41,7 @@ public class NMSAuthSessionService extends YggdrasilMinecraftSessionService {
 		this.database = database;
 		this.fetchProfile1 = NMSUtils.getMethod(oldSessionService.getClass(), "fetchProfile", GameProfile.class, boolean.class);
 		this.fetchProfile2 = NMSUtils.getMethod(oldSessionService.getClass(), "fetchProfile", UUID.class, boolean.class);
+		this.uuidNameCache = CacheBuilder.newBuilder().expireAfterWrite(6L, TimeUnit.HOURS).build();
 	}
 
 
@@ -38,6 +49,7 @@ public class NMSAuthSessionService extends YggdrasilMinecraftSessionService {
 		if(alwaysOnline.getOfflineMode()) {
 			UUID uuid = this.database.getUUID(profileName);
 			if(uuid != null){
+				this.uuidNameCache.put(uuid, Optional.of(new ProfileResult(new GameProfile(uuid, profileName))));
 				return new ProfileResult(new GameProfile(uuid, profileName));
 			}else{
 				alwaysOnline.getNativeExecutor().log(Level.INFO, profileName + " " + "never joined this server before when mojang servers were online. Denying their access.");
@@ -50,6 +62,9 @@ public class NMSAuthSessionService extends YggdrasilMinecraftSessionService {
 
 
 	public ProfileResult fetchProfile(GameProfile profile, boolean requireSecure) {
+		if(alwaysOnline.getOfflineMode()) {
+			return Objects.requireNonNull(uuidNameCache.getIfPresent(profile.getId())).orElse(null);
+		}
 		try {
 			return (ProfileResult) fetchProfile1.invoke(oldSessionService, profile, requireSecure);
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -59,10 +74,14 @@ public class NMSAuthSessionService extends YggdrasilMinecraftSessionService {
 
 
 	public ProfileResult fetchProfile(UUID profileId, boolean requireSecure) {
+		if(alwaysOnline.getOfflineMode()) {
+			return Objects.requireNonNull(uuidNameCache.getIfPresent(profileId)).orElse(null);
+        }
 		try {
 			return (ProfileResult) fetchProfile2.invoke(oldSessionService, profileId, requireSecure);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
+
 }
