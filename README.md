@@ -1,5 +1,7 @@
 # always-online
 
+Moved to https://github.com/AshleyThew/always-online
+
 # Overview
 
 Hate mojang servers being offline? Same with me. So to resolve this issue, I have created AlwaysOnline. A plugin that
